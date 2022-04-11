@@ -1,0 +1,40 @@
+syntax = "v1"
+
+info (
+	title: // TODO: add title
+	desc: // TODO: add description
+	author: "jinxin"
+	email: "jinx_nj@163.com"
+)
+
+type (
+	expandReq {
+		Hermesen string `form:"hermesen"`
+	}
+
+	expandResp {
+		Url string `json:"url"`
+	}
+)
+
+type (
+	hermesReq {
+		Url string `form:"url"`
+	}
+
+	hermesResp {
+		Hermesen string `json:"hermesen"`
+	}
+)
+
+service hermes-api {
+	@server(
+		handler: HermesHandler
+	)
+	get /hermesen(hermesReq) returns(hermesResp)
+	
+	@server(
+		handler: ExpandHandler
+	)
+	get /expand(expandReq) returns(expandResp)
+}
