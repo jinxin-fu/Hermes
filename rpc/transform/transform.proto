@@ -3,14 +3,23 @@ syntax = "proto3";
 package transform;
 option go_package="./transform";
 
-message Request {
-  string ping = 1;
+message expandReq {
+  string hermesen = 1;
 }
 
-message Response {
-  string pong = 1;
+message expandResp {
+  string url = 1;
 }
 
-service Transform {
-  rpc Ping(Request) returns(Response);
+message hermesenReq {
+  string url = 1;
+}
+
+message hermesResp {
+  string hermesen = 1;
+}
+
+service transformer {
+  rpc expand(expandReq) returns(expandResp);
+  rpc shorten(hermesenReq) returns(hermesResp);
 }
