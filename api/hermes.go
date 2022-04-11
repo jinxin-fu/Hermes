@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 
-	"hermes/api/internal/config"
-	"hermes/api/internal/handler"
-	"hermes/api/internal/svc"
+	"Hermes/api/internal/config"
+	"Hermes/api/internal/handler"
+	"Hermes/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"

@@ -9,7 +9,7 @@ info (
 
 type (
 	expandReq {
-		Hermesen string `form:"hermesen"`
+		hermesen string `form:"hermesen"`
 	}
 
 	expandResp {
@@ -23,7 +23,7 @@ type (
 	}
 
 	hermesResp {
-		Hermesen string `json:"hermesen"`
+		hermesen string `json:"hermesen"`
 	}
 )
 
