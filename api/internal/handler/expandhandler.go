@@ -18,7 +18,7 @@ func ExpandHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewExpandLogic(r.Context(), svcCtx)
-		resp, err := l.Expand(&req)
+		resp, err := l.Expand(req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

@@ -24,7 +24,13 @@ func NewExpandLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ExpandLogi
 }
 
 func (l *ExpandLogic) Expand(in *transform.ExpandReq) (*transform.ExpandResp, error) {
-	// todo: add your logic here and delete this line
+	// add manually
+	res, err := l.svcCtx.Model.FindOne(l.ctx, in.Hermesen)
+	if err != nil {
+		return nil, err
+	}
 
-	return &transform.ExpandResp{}, nil
+	return &transform.ExpandResp{
+		Url: res.Url,
+	}, nil
 }

@@ -18,7 +18,7 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewHermesLogic(r.Context(), svcCtx)
-		resp, err := l.Hermes(&req)
+		resp, err := l.Hermes(req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

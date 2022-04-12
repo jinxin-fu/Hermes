@@ -4,3 +4,7 @@ Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: transform.rpc
+DataSource: root:123456@tcp(192.168.2.64:3306)/gozero
+Table: hermesd
+Cache:
+  - Host: 192.168.2.64:6379
