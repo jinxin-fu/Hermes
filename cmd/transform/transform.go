@@ -1,14 +1,12 @@
 package main
 
 import (
+	"Hermes/rpc/transform/inter/config"
+	"Hermes/rpc/transform/inter/server"
+	"Hermes/rpc/transform/inter/svc"
+	"Hermes/rpc/transform/pb/transform"
 	"flag"
 	"fmt"
-
-	"Hermes/rpc/transform/internal/config"
-	"Hermes/rpc/transform/internal/server"
-	"Hermes/rpc/transform/internal/svc"
-	"Hermes/rpc/transform/pb/transform"
-
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -20,9 +18,26 @@ var configFile = flag.String("f", "etc/transform.yaml", "the config file")
 
 func main() {
 	flag.Parse()
-
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+
+	//c.Name = "transform.rpc"
+	//c.ListenOn = "127.0.0.1:8080"
+	//c.Etcd = discov.EtcdConf{
+	//	Hosts: []string{
+	//		"127.0.0..1:2379",
+	//	},
+	//	Key: "transform.rpc",
+	//}
+	//c.DataSource = "root:123456@tcp(192.168.2.64:3306)/gozero"
+	//c.Table = "hermesd"
+	//rdsConfig := redis.RedisConf{
+	//	Host: "192.168.2.64:6379",
+	//}
+	//c.Cache = cache.CacheConf{
+	//	cache.NodeConf{rdsConfig, 100},
+	//}
+
 	ctx := svc.NewServiceContext(c)
 	svr := server.NewTransformerServer(ctx)
 

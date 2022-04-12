@@ -1,14 +1,13 @@
 package main
 
 import (
+	"Hermes/api/inter/config"
+	"Hermes/api/inter/handler"
+	"Hermes/api/inter/svc"
 	"flag"
 	"fmt"
-
-	"Hermes/api/internal/config"
-	"Hermes/api/internal/handler"
-	"Hermes/api/internal/svc"
-
 	"github.com/zeromicro/go-zero/core/conf"
+
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -18,6 +17,14 @@ func main() {
 	flag.Parse()
 
 	var c config.Config
+	//c.Name = "hermes-api"
+	//c.Host = "0.0.0.0"
+	//c.Port = 8888
+	//c.Transform.Etcd = discov.EtcdConf{
+	//	Hosts: []string{
+	//		"localhost:2379",
+	//	},
+	//}
 	conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)

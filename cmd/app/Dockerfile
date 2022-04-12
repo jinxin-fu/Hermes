@@ -11,10 +11,11 @@ WORKDIR /build
 
 ADD go.mod .
 ADD go.sum .
-RUN go mod download
-COPY . .
+COPY ./api .
+COPY ./cmd/app ./cmd/app
 COPY api/etc /app/etc
-RUN go build -ldflags="-s -w" -o /app/hermes api/hermes.go
+RUN go mod tidy
+RUN go build -ldflags="-s -w" -o /app/hermes cmd/app/hermes.go
 
 
 FROM scratch
