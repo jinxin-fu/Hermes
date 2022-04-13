@@ -7,36 +7,49 @@ import (
 	"Hermes/rpc/transform/pb/transform"
 	"flag"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-var configFile = flag.String("f", "etc/transform.yaml", "the config file")
+//var configFile = flag.String("f", "etc/transform.yaml", "the config file")
 
 func main() {
 	flag.Parse()
 	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	//conf.MustLoad(*configFile, &c)
+	c.RpcServerConf = zrpc.RpcServerConf{
+		Redis: redis.RedisKeyConf{
+			Key: "pml@123",
+			RedisConf: redis.RedisConf{
+				Host: "127.0.0.1:9876",
+			},
+		},
+	}
+	c.Name = "transform.rpc"
+	c.ListenOn = "127.0.0.1:8080"
+	c.Etcd = discov.EtcdConf{
+		Hosts: []string{
+			"192.168.2.62:2379",
+		},
+		Key: "transform.rpc",
+	}
+	c.DataSource = "root:123456@tcp(192.168.2.62:3306)/gozero"
+	c.Table = "hermesd"
 
-	//c.Name = "transform.rpc"
-	//c.ListenOn = "127.0.0.1:8080"
-	//c.Etcd = discov.EtcdConf{
-	//	Hosts: []string{
-	//		"127.0.0..1:2379",
-	//	},
-	//	Key: "transform.rpc",
-	//}
-	//c.DataSource = "root:123456@tcp(192.168.2.64:3306)/gozero"
-	//c.Table = "hermesd"
-	//rdsConfig := redis.RedisConf{
-	//	Host: "192.168.2.64:6379",
-	//}
-	//c.Cache = cache.CacheConf{
-	//	cache.NodeConf{rdsConfig, 100},
-	//}
+	c.Cache = cache.ClusterConf{
+		{
+			Weight: 100,
+			RedisConf: redis.RedisConf{
+				Host: "127.0.0.1:9876",
+			},
+		},
+	}
+	c.Log.Path = "logs"
 
 	ctx := svc.NewServiceContext(c)
 	svr := server.NewTransformerServer(ctx)
