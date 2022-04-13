@@ -1,8 +1,8 @@
 syntax = "v1"
 
 info (
-	title: // TODO: add title
-	desc: // TODO: add description
+	title: Hermes service
+	desc: For hyperOS monitorsystem message query and distribute
 	author: "jinxin"
 	email: "jinx_nj@163.com"
 )
