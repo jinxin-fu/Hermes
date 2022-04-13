@@ -14,6 +14,7 @@ import (
 )
 
 const kubeconfigPath = "C:\\Users\\Lenovo\\.kube"
+const kubeconfigName = "config"
 
 var clientGlobal dynamic.Interface
 
@@ -21,15 +22,15 @@ type RuleSetter struct {
 	client dynamic.Interface
 }
 
-func tes() {
-	var rs RuleSetter
-	err := rs.NewRuleSetter(kubeconfigPath, "config")
-	if err != nil {
-		panic(err)
-	}
-	rs.CreatePrometheusRule("hypermonitor", PrometheusRuleTemplate)
-
-}
+//func test() {
+//	var rs RuleSetter
+//	err := rs.NewRuleSetter(kubeconfigPath, "kubeconfigName")
+//	if err != nil {
+//		panic(err)
+//	}
+//	rs.CreatePrometheusRule("hypermonitor", PrometheusRuleTemplate)
+//
+//}
 
 func (r *RuleSetter) NewRuleSetter(path, name string) error {
 	kubeconfig := filepath.Join(path, "config")
