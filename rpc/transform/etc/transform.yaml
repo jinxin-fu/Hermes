@@ -2,9 +2,10 @@ Name: transform.rpc
 ListenOn: 127.0.0.1:8080
 Etcd:
   Hosts:
-  - 192.168.2.64:2379
+  - 192.168.2.62:2379
   Key: transform.rpc
-DataSource: root:123456@tcp(192.168.2.64:3306)/gozero
+DataSource: root:123456@tcp(192.168.2.62:3306)/gozero
 Table: hermesd
 Cache:
-  - Host: 192.168.2.64:6379
+  - Host: 192.168.2.62:9876
+    Pass: pml@123

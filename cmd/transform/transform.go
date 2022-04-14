@@ -22,14 +22,14 @@ func main() {
 	flag.Parse()
 	var c config.Config
 	//conf.MustLoad(*configFile, &c)
-	c.RpcServerConf = zrpc.RpcServerConf{
-		Redis: redis.RedisKeyConf{
-			Key: "pml@123",
-			RedisConf: redis.RedisConf{
-				Host: "127.0.0.1:9876",
-			},
-		},
-	}
+	//c.RpcServerConf = zrpc.RpcServerConf{
+	//	Redis: redis.RedisKeyConf{
+	//		RedisConf: redis.RedisConf{
+	//			Host: "127.0.0.1:9876",
+	//			Pass: "pml@123",
+	//		},
+	//	},
+	//}
 	c.Name = "transform.rpc"
 	c.ListenOn = "127.0.0.1:8080"
 	c.Etcd = discov.EtcdConf{
@@ -45,7 +45,8 @@ func main() {
 		{
 			Weight: 100,
 			RedisConf: redis.RedisConf{
-				Host: "127.0.0.1:9876",
+				Host: "192.168.2.62:9876",
+				Pass: "pml@123",
 			},
 		},
 	}
