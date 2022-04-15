@@ -1,8 +1,8 @@
 Name: hermes-api
 Host: 0.0.0.0
 Port: 8888
-Transform:
-  Etcd:
-    Hosts:
-      - 192.168.2.62:2379
-    Key: transform.rpc
+#Transform:
+#  Etcd:
+#    Hosts:
+#      - 192.168.2.62:2379
+#    Key: transform.rpc

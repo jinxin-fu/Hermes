@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"Hermes/rpc/transform/transformer"
 	"context"
 
 	"Hermes/api/inter/svc"
@@ -27,14 +26,16 @@ func NewHermesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *HermesLogi
 func (l *HermesLogic) Hermes(req types.HermesReq) (types.HermesResp, error) {
 	// add manually
 
-	resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
-		Url: req.Url,
-	})
-	if err != nil {
-		return types.HermesResp{}, err
-	}
+	//resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
+	//	Url: req.Url,
+	//})
+	//if err != nil {
+	//	return types.HermesResp{}, err
+	//}
+	//
+	//return types.HermesResp{
+	//	Hermesen: resp.Hermesen,
+	//}, nil
 
-	return types.HermesResp{
-		Hermesen: resp.Hermesen,
-	}, nil
+	return types.HermesResp{}, nil
 }

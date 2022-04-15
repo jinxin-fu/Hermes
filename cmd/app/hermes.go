@@ -6,8 +6,6 @@ import (
 	"Hermes/api/inter/svc"
 	"flag"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/discov"
-
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -20,12 +18,12 @@ func main() {
 	c.Name = "hermes-api"
 	c.Host = "0.0.0.0"
 	c.Port = 8888
-	c.Transform.Etcd = discov.EtcdConf{
-		Hosts: []string{
-			"192.168.2.62:2379",
-		},
-		Key: "transform.rpc",
-	}
+	//c.Transform.Etcd = discov.EtcdConf{
+	//	Hosts: []string{
+	//		"192.168.2.62:2379",
+	//	},
+	//	Key: "transform.rpc",
+	//}
 	c.Log.Path = "logs"
 	//conf.MustLoad(*configFile, &c)
 

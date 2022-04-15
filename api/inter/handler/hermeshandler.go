@@ -1,21 +1,42 @@
 package handler
 
 import (
-	"net/http"
-
 	"Hermes/api/inter/logic"
 	"Hermes/api/inter/svc"
 	"Hermes/api/inter/types"
+	"encoding/json"
+	"fmt"
+	alertdata "github.com/prometheus/alertmanager/template"
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"net/http"
 )
 
 func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.HermesReq
-		if err := httpx.Parse(r, &req); err != nil {
-			httpx.Error(w, err)
-			return
+
+		fmt.Printf("**************\n")
+
+		data := alertdata.Data{}
+
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			fmt.Printf("%s\n", err.Error())
 		}
+		//res, _ := json.Marshal(data)
+		//
+		//var out bytes.Buffer
+		//err := json.Indent(&out, res, "", "\t")
+		//
+		//out.WriteTo(os.Stdout)
+		//println()
+
+		fmt.Printf("**************\n")
+
+		var req types.HermesReq
+
+		//if err := httpx.Parse(r, &req); err != nil {
+		//	httpx.Error(w, err)
+		//	return
+		//}
 
 		l := logic.NewHermesLogic(r.Context(), svcCtx)
 		resp, err := l.Hermes(req)
