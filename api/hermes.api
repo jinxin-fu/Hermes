@@ -9,26 +9,30 @@ info (
 
 type (
 	expandReq {
-		Hermesen string `form:"hermesen"`
+		AlertName string `form:"alertName"`
 	}
 
 	expandResp {
-		Url string `json:"url"`
+        AlertName       string `json:"alertName"`
+        AggerateRules   string `json:"aggerateRules"`
+        ReceiverAddress string `json:"receiveraddress"`
+        ReturnValueFlag string `json:"returnValueFlag"`
 	}
 )
 
 type (
 	hermesReq {
-	    AlertName       string `from:"alertname"`
+	    AlertName       string `from:"alertName"`
         AggerateRules   string `from:"aggerateRules"`
         ReceiverAddress string `from:"receiveraddress"`
         ReturnValueFlag string `from:"returnValueFlag"`
 	}
 
 	hermesResp {
-        AggerateRules   string `from:"aggerateRules"`
-        ReceiverAddress string `from:"receiveraddress"`
-        ReturnValueFlag string `from:"returnValueFlag"`
+	    AlertName       string `json:"alertName"`
+        AggerateRules   string `json:"aggerateRules"`
+        ReceiverAddress string `json:"receiveraddress"`
+        ReturnValueFlag string `json:"returnValueFlag"`
 	}
 )
 

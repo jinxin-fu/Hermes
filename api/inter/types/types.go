@@ -5,10 +5,10 @@ type ExpandReq struct {
 }
 
 type ExpandResp struct {
-	AlertName       string `from:"alertName"`
-	AggerateRules   string `from:"aggerateRules"`
-	ReceiverAddress string `from:"receiveraddress"`
-	ReturnValueFlag string `from:"returnValueFlag"`
+	AlertName       string `json:"alertName"`
+	AggerateRules   string `json:"aggerateRules"`
+	ReceiverAddress string `json:"receiveraddress"`
+	ReturnValueFlag string `json:"returnValueFlag"`
 }
 
 type AlertsFromAlertmanage struct {
@@ -28,8 +28,8 @@ type HermesReq struct {
 }
 
 type HermesResp struct {
-	AlertName       string `from:"alertName"`
-	AggerateRules   string `from:"aggerateRules"`
-	ReceiverAddress string `from:"receiveraddress"`
-	ReturnValueFlag string `from:"returnValueFlag"`
+	AlertName       string `json:"alertName"`
+	AggerateRules   string `json:"aggerateRules"`
+	ReceiverAddress string `json:"receiveraddress"`
+	ReturnValueFlag string `json:"returnValueFlag"`
 }
