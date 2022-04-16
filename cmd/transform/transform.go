@@ -4,7 +4,7 @@ import (
 	"Hermes/rpc/transform/inter/config"
 	"Hermes/rpc/transform/inter/server"
 	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/pb/transform"
+	"Hermes/rpc/transform/transform"
 	"flag"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/discov"

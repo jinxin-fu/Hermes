@@ -8,7 +8,7 @@ import (
 
 	"Hermes/rpc/transform/inter/logic"
 	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/pb/transform"
+	"Hermes/rpc/transform/transform"
 )
 
 type TransformerServer struct {

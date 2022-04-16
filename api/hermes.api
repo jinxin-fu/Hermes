@@ -19,11 +19,16 @@ type (
 
 type (
 	hermesReq {
-		Url string `form:"url"`
+	    AlertName       string `from:"alertname"`
+        AggerateRules   string `from:"aggerateRules"`
+        ReceiverAddress string `from:"receiveraddress"`
+        ReturnValueFlag string `from:"returnValueFlag"`
 	}
 
 	hermesResp {
-		Hermesen string `json:"hermesen"`
+        AggerateRules   string `from:"aggerateRules"`
+        ReceiverAddress string `from:"receiveraddress"`
+        ReturnValueFlag string `from:"returnValueFlag"`
 	}
 )
 
@@ -31,7 +36,7 @@ service hermes-api {
 	@server(
 		handler: HermesHandler
 	)
-	get /hermesen(hermesReq) returns(hermesResp)
+	post /hermesen(hermesReq) returns(hermesResp)
 	
 	@server(
 		handler: ExpandHandler

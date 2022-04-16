@@ -8,14 +8,12 @@ import (
 
 type ServiceContext struct {
 	Config config.Config
-	// add manually
-	Model model.HermesdModel
+	Model  model.HermesdModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
-		// add manually
-		Model: model.NewHermesdModel(sqlx.NewMysql(c.DataSource), c.Cache),
+		Model:  model.NewHermesdModel(sqlx.NewMysql(c.DataSource), c.Cache),
 	}
 }

@@ -6,11 +6,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"strings"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
@@ -19,17 +19,17 @@ var (
 	hermesdFieldNames          = builder.RawFieldNames(&Hermesd{})
 	hermesdRows                = strings.Join(hermesdFieldNames, ",")
 	hermesdRowsExpectAutoSet   = strings.Join(stringx.Remove(hermesdFieldNames, "`create_time`", "`update_time`"), ",")
-	hermesdRowsWithPlaceHolder = strings.Join(stringx.Remove(hermesdFieldNames, "`hermes`", "`create_time`", "`update_time`"), "=?,") + "=?"
+	hermesdRowsWithPlaceHolder = strings.Join(stringx.Remove(hermesdFieldNames, "`aletname`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
-	cacheHermesdHermesPrefix = "cache:hermesd:hermes:"
+	cacheHermesdAletnamePrefix = "cache:hermesd:aletname:"
 )
 
 type (
 	hermesdModel interface {
 		Insert(ctx context.Context, data *Hermesd) (sql.Result, error)
-		FindOne(ctx context.Context, hermes string) (*Hermesd, error)
+		FindOne(ctx context.Context, aletname string) (*Hermesd, error)
 		Update(ctx context.Context, data *Hermesd) error
-		Delete(ctx context.Context, hermes string) error
+		Delete(ctx context.Context, aletname string) error
 	}
 
 	defaultHermesdModel struct {
@@ -38,8 +38,10 @@ type (
 	}
 
 	Hermesd struct {
-		Hermes string `db:"hermes"` // shorten key
-		Url    string `db:"url"`    // original url
+		Aletname        string `db:"aletname"`        // aletname
+		Aggeraterules   string `db:"aggeraterules"`   // aggerate rules
+		Receiveraddress string `db:"receiveraddress"` // receiver address
+		Returnvalueflag string `db:"returnvalueflag"` // return value flag
 	}
 )
 
@@ -51,20 +53,20 @@ func newHermesdModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultHermesdModel 
 }
 
 func (m *defaultHermesdModel) Insert(ctx context.Context, data *Hermesd) (sql.Result, error) {
-	hermesdHermesKey := fmt.Sprintf("%s%v", cacheHermesdHermesPrefix, data.Hermes)
+	hermesdAletnameKey := fmt.Sprintf("%s%v", cacheHermesdAletnamePrefix, data.Aletname)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?)", m.table, hermesdRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Hermes, data.Url)
-	}, hermesdHermesKey)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, hermesdRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Aletname, data.Aggeraterules, data.Receiveraddress, data.Returnvalueflag)
+	}, hermesdAletnameKey)
 	return ret, err
 }
 
-func (m *defaultHermesdModel) FindOne(ctx context.Context, hermes string) (*Hermesd, error) {
-	hermesdHermesKey := fmt.Sprintf("%s%v", cacheHermesdHermesPrefix, hermes)
+func (m *defaultHermesdModel) FindOne(ctx context.Context, aletname string) (*Hermesd, error) {
+	hermesdAletnameKey := fmt.Sprintf("%s%v", cacheHermesdAletnamePrefix, aletname)
 	var resp Hermesd
-	err := m.QueryRowCtx(ctx, &resp, hermesdHermesKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
-		query := fmt.Sprintf("select %s from %s where `hermes` = ? limit 1", hermesdRows, m.table)
-		return conn.QueryRowCtx(ctx, v, query, hermes)
+	err := m.QueryRowCtx(ctx, &resp, hermesdAletnameKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where `aletname` = ? limit 1", hermesdRows, m.table)
+		return conn.QueryRowCtx(ctx, v, query, aletname)
 	})
 	switch err {
 	case nil:
@@ -77,29 +79,29 @@ func (m *defaultHermesdModel) FindOne(ctx context.Context, hermes string) (*Herm
 }
 
 func (m *defaultHermesdModel) Update(ctx context.Context, data *Hermesd) error {
-	hermesdHermesKey := fmt.Sprintf("%s%v", cacheHermesdHermesPrefix, data.Hermes)
+	hermesdAletnameKey := fmt.Sprintf("%s%v", cacheHermesdAletnamePrefix, data.Aletname)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set %s where `hermes` = ?", m.table, hermesdRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.Url, data.Hermes)
-	}, hermesdHermesKey)
+		query := fmt.Sprintf("update %s set %s where `aletname` = ?", m.table, hermesdRowsWithPlaceHolder)
+		return conn.ExecCtx(ctx, query, data.Aggeraterules, data.Receiveraddress, data.Returnvalueflag, data.Aletname)
+	}, hermesdAletnameKey)
 	return err
 }
 
-func (m *defaultHermesdModel) Delete(ctx context.Context, hermes string) error {
-	hermesdHermesKey := fmt.Sprintf("%s%v", cacheHermesdHermesPrefix, hermes)
+func (m *defaultHermesdModel) Delete(ctx context.Context, aletname string) error {
+	hermesdAletnameKey := fmt.Sprintf("%s%v", cacheHermesdAletnamePrefix, aletname)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("delete from %s where `hermes` = ?", m.table)
-		return conn.ExecCtx(ctx, query, hermes)
-	}, hermesdHermesKey)
+		query := fmt.Sprintf("delete from %s where `aletname` = ?", m.table)
+		return conn.ExecCtx(ctx, query, aletname)
+	}, hermesdAletnameKey)
 	return err
 }
 
 func (m *defaultHermesdModel) formatPrimary(primary interface{}) string {
-	return fmt.Sprintf("%s%v", cacheHermesdHermesPrefix, primary)
+	return fmt.Sprintf("%s%v", cacheHermesdAletnamePrefix, primary)
 }
 
 func (m *defaultHermesdModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn, v, primary interface{}) error {
-	query := fmt.Sprintf("select %s from %s where `hermes` = ? limit 1", hermesdRows, m.table)
+	query := fmt.Sprintf("select %s from %s where `aletname` = ? limit 1", hermesdRows, m.table)
 	return conn.QueryRowCtx(ctx, v, query, primary)
 }
 

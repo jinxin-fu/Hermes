@@ -93,10 +93,13 @@ func CreatePromruleWithYaml(clien dynamic.Interface, namespace string, yamlData 
 						Expr:  intstr.FromString("count by (namespace,service) (\n  count_values by (namespace,service) (\"config_hash\", alertmanager_config_hash{job=\"prometheus-kube-prometheus-alertmanager\",namespace=\"hypermonitor\"})\n)\n!= 1"),
 						Labels: map[string]string{
 							"alertlabel": "alertlabel",
+							"alertname":  "TestAlert",
 						},
 						Annotations: map[string]string{
+							"alertName":       "TestAlert",
 							"receiverAddress": "http://ip+port",
 							"aggerateRules":   "(count by (namespace,service) (changes(process_start_time_seconds{job=\"prometheus-kube-prometheus-alertmanager\",namespace=\"hypermonitor\"}[10m]) > 4)/ count by (namespace,service) (up{job=\"prometheus-kube-prometheus-alertmanager\",namespace=\"hypermonitor\"}))>= 0.5",
+							"returnValueFlah": "true",
 						},
 					},
 				},

@@ -3,7 +3,7 @@ package handler
 import (
 	"Hermes/api/inter/logic"
 	"Hermes/api/inter/svc"
-	"Hermes/api/inter/types"
+	"Hermes/pkg/parser"
 	"encoding/json"
 	"fmt"
 	alertdata "github.com/prometheus/alertmanager/template"
@@ -21,6 +21,14 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 			fmt.Printf("%s\n", err.Error())
 		}
+		alertNumber := len(data.Alerts)
+
+		alertInfo, err := parser.AlertInfoParser(data, alertNumber)
+		if err != nil {
+			fmt.Printf("alert parse fail.\n")
+			httpx.Error(w, err)
+		}
+
 		//res, _ := json.Marshal(data)
 		//
 		//var out bytes.Buffer
@@ -31,7 +39,7 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		fmt.Printf("**************\n")
 
-		var req types.HermesReq
+		//var req []types.HermesReq
 
 		//if err := httpx.Parse(r, &req); err != nil {
 		//	httpx.Error(w, err)
@@ -39,7 +47,7 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		//}
 
 		l := logic.NewHermesLogic(r.Context(), svcCtx)
-		resp, err := l.Hermes(req)
+		resp, err := l.Hermes(alertInfo)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

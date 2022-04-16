@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/pb/transform"
+	"Hermes/rpc/transform/transform"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,13 +24,16 @@ func NewExpandLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ExpandLogi
 }
 
 func (l *ExpandLogic) Expand(in *transform.ExpandReq) (*transform.ExpandResp, error) {
-	// add manually
-	res, err := l.svcCtx.Model.FindOne(l.ctx, in.Hermesen)
+
+	res, err := l.svcCtx.Model.FindOne(l.ctx, in.AlertName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &transform.ExpandResp{
-		Url: res.Url,
+		AlertName:       res.Aletname,
+		AggeratuRule:    res.Aggeraterules,
+		ReturnValueFlag: res.Returnvalueflag,
+		ReceiverAddress: res.Receiveraddress,
 	}, nil
 }

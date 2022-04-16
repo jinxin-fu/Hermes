@@ -6,7 +6,7 @@ package transformer
 import (
 	"context"
 
-	"Hermes/rpc/transform/pb/transform"
+	"Hermes/rpc/transform/transform"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
