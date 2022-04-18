@@ -45,3 +45,7 @@ func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.HermesResp,
 	}, nil
 
 }
+
+func (l *HermesLogic) SendToRpc() (types.HermesResp, error) {
+
+}
