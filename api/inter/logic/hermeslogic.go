@@ -3,6 +3,8 @@ package logic
 import (
 	"Hermes/rpc/transform/transformer"
 	"context"
+	"fmt"
+	"sync"
 
 	"Hermes/api/inter/svc"
 	"Hermes/api/inter/types"
@@ -24,26 +26,40 @@ func NewHermesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *HermesLogi
 	}
 }
 
-func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
-	// add manually
-	inProcessReuest := 0
-	for i := 0; i < req.MacthedAlerts; i++ {
-		_, err := SendToRpc(l, req.Alerts[i])
-		if err != nil {
-			return types.AlertmanagerResp{}, err
+func processAlerts(l *HermesLogic, req types.AlertsFromAlertmanage) []types.HermesResp {
+	var result []types.HermesResp
+	wg := &sync.WaitGroup{}
+	limiter := make(chan bool, 20) //限制最大并发
+	defer close(limiter)
+
+	responseCh := make(chan types.HermesResp, req.MacthedAlerts)
+	wgResponse := &sync.WaitGroup{}
+	go func() {
+		wgResponse.Add(1)
+		for response := range responseCh {
+			result = append(result, response)
 		}
-		inProcessReuest++
+		wgResponse.Done()
+	}()
+
+	for _, v := range req.Alerts {
+		wg.Add(1)
+		limiter <- true
+		go sendToRpc(l, v, limiter, responseCh, wg)
 	}
 
-	return types.AlertmanagerResp{
-		Receiver:        req.Receiver,
-		MatchedAlerts:   req.MacthedAlerts,
-		InProcessNumber: inProcessReuest,
-	}, nil
+	wg.Wait()
+	fmt.Println("Alerts process finished.")
+	close(responseCh)
+
+	wgResponse.Wait()
+	return result
 
 }
 
-func SendToRpc(l *HermesLogic, req types.HermesReq) (types.HermesResp, error) {
+func sendToRpc(l *HermesLogic, req types.HermesReq, limiter chan bool, responseCh chan types.HermesResp, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
 		AlertName:       req.AlertName,
 		ReceiverAddress: req.ReceiverAddress,
@@ -51,13 +67,26 @@ func SendToRpc(l *HermesLogic, req types.HermesReq) (types.HermesResp, error) {
 		AggeratuRule:    req.AggerateRules,
 	})
 	if err != nil {
-		return types.HermesResp{}, err
+		fmt.Printf("process fail %s", err.Error())
+		responseCh <- types.HermesResp{}
 	}
-	return types.HermesResp{
-		AggerateRules:   resp.AggeratuRule,
+	responseCh <- types.HermesResp{
 		AlertName:       resp.AlertName,
-		ReturnValueFlag: resp.ReturnValueFlag,
+		AggerateRules:   resp.AggeratuRule,
 		ReceiverAddress: resp.ReceiverAddress,
+		ReturnValueFlag: resp.ReturnValueFlag,
+	}
+	<-limiter
+
+}
+func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
+	// add manually
+
+	res := processAlerts(l, req)
+	return types.AlertmanagerResp{
+		Receiver:        req.Receiver,
+		MatchedAlerts:   req.MacthedAlerts,
+		InProcessNumber: len(res),
 	}, nil
 
 }
