@@ -39,3 +39,11 @@ type AlertmanagerResp struct {
 	Receiver        string `json:"receiver"`
 	MatchedAlerts   int    `json:"matchedAlerts"`
 }
+
+type QueryResp struct {
+	Name        string
+	Expression  string
+	Value       float64
+	Flag        bool
+	Destination string
+}

@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"Hermes/pkg/datasender"
+	"Hermes/pkg/querier"
 	"Hermes/rpc/transform/transformer"
 	"context"
 	"fmt"
@@ -80,9 +82,16 @@ func sendToRpc(l *HermesLogic, req types.HermesReq, limiter chan bool, responseC
 
 }
 func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
-	// add manually
-
+	// process alerts and send data to rpc transformer backend mysql
 	res := processAlerts(l, req)
+	// query result form prometheus
+
+	queryResult := querier.PrometheusQuery(res)
+
+	// distribute data to consumer
+
+	datasender.Distributor(queryResult)
+
 	return types.AlertmanagerResp{
 		Receiver:        req.Receiver,
 		MatchedAlerts:   req.MacthedAlerts,

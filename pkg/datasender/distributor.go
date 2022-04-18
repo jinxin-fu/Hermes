@@ -5,3 +5,9 @@
  * @Description:
  */
 package datasender
+
+import "Hermes/api/inter/types"
+
+func Distributor(qresps []types.QueryResp) {
+
+}
