@@ -33,3 +33,9 @@ type HermesResp struct {
 	ReceiverAddress string `json:"receiveraddress"`
 	ReturnValueFlag string `json:"returnValueFlag"`
 }
+
+type AlertmanagerResp struct {
+	InProcessNumber int    `json:"inProcessNumber"`
+	Receiver        string `json:"receiver"`
+	MatchedAlerts   int    `json:"matchedAlerts"`
+}

@@ -24,28 +24,40 @@ func NewHermesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *HermesLogi
 	}
 }
 
-func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.HermesResp, error) {
+func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
 	// add manually
-
-	resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
-		AlertName:       req.Alerts[1].AlertName,
-		ReceiverAddress: req.Alerts[1].ReceiverAddress,
-		ReturnValueFlag: req.Alerts[1].ReturnValueFlag,
-		AggeratuRule:    req.Alerts[1].AggerateRules,
-	})
-	if err != nil {
-		return types.HermesResp{}, err
+	inProcessReuest := 0
+	for i := 0; i < req.MacthedAlerts; i++ {
+		_, err := SendToRpc(l, req.Alerts[i])
+		if err != nil {
+			return types.AlertmanagerResp{}, err
+		}
+		inProcessReuest++
 	}
 
-	return types.HermesResp{
-		AlertName:       resp.AlertName,
-		AggerateRules:   resp.AggeratuRule,
-		ReceiverAddress: resp.ReceiverAddress,
-		ReturnValueFlag: resp.ReturnValueFlag,
+	return types.AlertmanagerResp{
+		Receiver:        req.Receiver,
+		MatchedAlerts:   req.MacthedAlerts,
+		InProcessNumber: inProcessReuest,
 	}, nil
 
 }
 
-func (l *HermesLogic) SendToRpc() (types.HermesResp, error) {
+func SendToRpc(l *HermesLogic, req types.HermesReq) (types.HermesResp, error) {
+	resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
+		AlertName:       req.AlertName,
+		ReceiverAddress: req.ReceiverAddress,
+		ReturnValueFlag: req.ReturnValueFlag,
+		AggeratuRule:    req.AggerateRules,
+	})
+	if err != nil {
+		return types.HermesResp{}, err
+	}
+	return types.HermesResp{
+		AggerateRules:   resp.AggeratuRule,
+		AlertName:       resp.AlertName,
+		ReturnValueFlag: resp.ReturnValueFlag,
+		ReceiverAddress: resp.ReceiverAddress,
+	}, nil
 
 }

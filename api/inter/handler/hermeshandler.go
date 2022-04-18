@@ -47,6 +47,9 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		//	httpx.Error(w, err)
 		//	return
 		//}
+		if alertInfo.MacthedAlerts == 0 {
+			httpx.Error(w, fmt.Errorf("no matched hyperos-rule trigger in hermes."))
+		}
 
 		l := logic.NewHermesLogic(r.Context(), svcCtx)
 		resp, err := l.Hermes(alertInfo)
