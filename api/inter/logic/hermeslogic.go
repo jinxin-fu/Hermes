@@ -6,6 +6,7 @@ import (
 	"Hermes/rpc/transform/transformer"
 	"context"
 	"fmt"
+	"log"
 	"sync"
 
 	"Hermes/api/inter/svc"
@@ -90,7 +91,11 @@ func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.Alertmanage
 
 	// distribute data to consumer
 
-	datasender.Distributor(queryResult)
+	err := datasender.Distributor(queryResult)
+	if err != nil {
+		log.Fatal("distribute message to consumer fail", err.Error())
+		return types.AlertmanagerResp{}, fmt.Errorf("Distribute messager error : %s", err.Error())
+	}
 
 	return types.AlertmanagerResp{
 		Receiver:        req.Receiver,
