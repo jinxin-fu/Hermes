@@ -6,7 +6,6 @@ import (
 	"Hermes/rpc/transform/transformer"
 	"context"
 	"fmt"
-	"log"
 	"sync"
 
 	"Hermes/api/inter/svc"
@@ -85,16 +84,18 @@ func sendToRpc(l *HermesLogic, req types.HermesReq, limiter chan bool, responseC
 func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
 	// process alerts and send data to rpc transformer backend mysql
 	res := processAlerts(l, req)
-	// query result form prometheus
 
+	// query result form prometheus
 	queryResult := querier.PrometheusQuery(res)
 
 	// distribute data to consumer
-
-	err := datasender.Distributor(queryResult)
+	disResult, err := datasender.Distributor(queryResult)
 	if err != nil {
-		log.Fatal("distribute message to consumer fail", err.Error())
+		fmt.Printf("distribute message to consumer fail", err.Error())
 		return types.AlertmanagerResp{}, fmt.Errorf("Distribute messager error : %s", err.Error())
+	}
+	for _, v := range disResult {
+		fmt.Printf("singel distribute result :%v\n", v)
 	}
 
 	return types.AlertmanagerResp{

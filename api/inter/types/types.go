@@ -47,3 +47,10 @@ type QueryResp struct {
 	Flag        bool
 	Destination string
 }
+
+type DistributeResult struct {
+	Receiver   string
+	Status     string
+	StatusCode int
+	Err        error
+}

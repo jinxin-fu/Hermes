@@ -26,8 +26,12 @@ var client api.Client
 var initErr error
 
 func init() {
+	add := os.Getenv("PROMETHEUSADDRESS")
+	if add == "" {
+		add = "http://192.168.1.51:31445"
+	}
 	client, initErr = api.NewClient(api.Config{
-		Address: "http://192.168.1.51:31445",
+		Address: add,
 	})
 	if initErr != nil {
 		fmt.Printf("Error creating client: %v\n", initErr)
@@ -40,9 +44,9 @@ func PrometheusQuery(resp []types.HermesResp) []types.QueryResp {
 	var qResps []types.QueryResp
 	wg := &sync.WaitGroup{}
 	limiter := make(chan bool, 20)
-
+	defer close(limiter)
 	v1api1 := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
 	responseCh := make(chan types.QueryResp)
@@ -65,7 +69,7 @@ func PrometheusQuery(resp []types.HermesResp) []types.QueryResp {
 	wg.Wait()
 	fmt.Println("Prometheus query process finished")
 	close(responseCh)
-	wg.Wait()
+	wgResponse.Wait()
 	return qResps
 
 }
@@ -75,13 +79,13 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 
 	result, _, err := api.Query(ctx, resp.AggerateRules, time.Now())
 	if err != nil {
-		fmt.Printf("Error querying Prometheus: %v\n", err)
-		os.Exit(1)
+		fmt.Printf("Error querying Prometheus, alertName:%s error:%v\n", resp.AlertName, err)
+
 	}
 	//obj := &unstructured.Unstructured{}
 	//str := result.String()
-	println(len(result.(model.Vector)))
-	v := result.(model.Vector)[0]
+	//println(len(result.(model.Vector)))
+	v := result.(model.Vector)[0] // TODO默认去第一个metric值，具体逻辑等上真是环境上调试
 	value := v.Value
 	//for _, v := range result.(model.Vector) {
 	//	fmt.Printf("value: %v\n", v.Value)
@@ -94,7 +98,7 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 	//for k,v := range result.(model.Vector)
 	//str := result.String()
 	var flag bool
-	fmt.Printf("Result: \n%v\n", result.String())
+	//fmt.Printf("Result: \n%v\n", result.String())
 	if resp.ReturnValueFlag == "false" {
 		flag = false
 	} else {
