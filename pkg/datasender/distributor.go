@@ -49,9 +49,9 @@ func Distributor(qResps []types.QueryResp) ([]types.DistributeResult, error) {
 
 func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter chan bool, wg *sync.WaitGroup) {
 	defer wg.Done()
-	address := "http://127.0.0.1:5000/parsePrometheusAlert"
+	//address := "http://127.0.0.1:5000/parsePrometheusAlert"
 	//ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-	req, err := http.NewRequest(http.MethodPost, address, nil)
+	req, err := http.NewRequest(http.MethodPost, qReq.Destination, nil)
 	if err != nil {
 		fmt.Printf("New request error: %s\n", err.Error())
 	}
