@@ -49,9 +49,14 @@ func Distributor(qResps []types.QueryResp) ([]types.DistributeResult, error) {
 
 func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter chan bool, wg *sync.WaitGroup) {
 	defer wg.Done()
-	//address := "http://127.0.0.1:5000/parsePrometheusAlert"
+	if qReq.Err != nil {
+		resCh <- types.DistributeResult{
+			Err: fmt.Errorf("error from queryResponse:" + qReq.Err.Error()),
+		}
+	}
+	address := "http://192.168.2.64:5000/parsePrometheusAlert"
 	//ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-	req, err := http.NewRequest(http.MethodPost, qReq.Destination, nil)
+	req, err := http.NewRequest(http.MethodPost, address, nil)
 	if err != nil {
 		fmt.Printf("New request error: %s\n", err.Error())
 	}
@@ -69,14 +74,18 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	//response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Printf("Distribute to consumer err :%s", err.Error())
+		resCh <- types.DistributeResult{
+			Err: err,
+		}
+	} else {
+		resCh <- types.DistributeResult{
+			Receiver:   qReq.Destination,
+			Status:     response.Status,
+			StatusCode: response.StatusCode,
+			Err:        err,
+		}
 	}
 	defer response.Body.Close()
-	resCh <- types.DistributeResult{
-		Receiver:   qReq.Destination,
-		Status:     response.Status,
-		StatusCode: response.StatusCode,
-		Err:        err,
-	}
 
 	<-limiter
 }

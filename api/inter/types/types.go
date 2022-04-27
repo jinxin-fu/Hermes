@@ -46,6 +46,7 @@ type QueryResp struct {
 	Value       float64
 	Flag        bool
 	Destination string
+	Err         error
 }
 
 type DistributeResult struct {

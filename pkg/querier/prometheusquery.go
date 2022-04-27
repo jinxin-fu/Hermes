@@ -82,9 +82,16 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 		fmt.Printf("Error querying Prometheus, alertName:%s error:%v\n", resp.AlertName, err)
 
 	}
+
 	//obj := &unstructured.Unstructured{}
 	//str := result.String()
 	//println(len(result.(model.Vector)))
+	if result.Type() != model.ValVector {
+		responseCh <- types.QueryResp{
+			Err: fmt.Errorf("query result is not type vector"),
+		}
+		return
+	}
 	v := result.(model.Vector)[0] // TODO默认去第一个metric值，具体逻辑等上真是环境上调试
 	value := v.Value
 	//for _, v := range result.(model.Vector) {
@@ -110,6 +117,7 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 		Expression:  resp.AggerateRules,
 		Flag:        flag,
 		Value:       float64(value),
+		Err:         nil,
 	}
 	<-limiter
 }
