@@ -5,11 +5,12 @@ LABEL stage=gobuilder
 ENV CGO_ENABLED 0
 ENV GOPROXY https://goproxy.cn,direct
 
-RUN apk update --no-cache && apk add --no-cache tzdata
+RUN apk update --no-cache && apk add --no-cache tzdata && apk add --no-cache dos2unix
 
 WORKDIR /build
 
 COPY . .
+RUN dos2unix run/run.sh
 RUN go mod tidy
 RUN go build -ldflags="-s -w" -o /app/hermes cmd/app/hermes.go
 RUN go build -ldflags="-s -w" -o /app/transform cmd/transform/transform.go
