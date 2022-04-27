@@ -7,5 +7,5 @@ step=3
 sleep $step
 
 # start transform
-./hermes
+./hermes -f hermes-api.yaml
 

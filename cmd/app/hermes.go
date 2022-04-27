@@ -6,27 +6,27 @@ import (
 	"Hermes/api/inter/svc"
 	"flag"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/discov"
+	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 )
 
-//var configFile = flag.String("f", "etc/hermes-api.yaml", "the config file")
+var configFile = flag.String("f", "etc/hermes-api.yaml", "the config file")
 
 func main() {
 	flag.Parse()
 
 	var c config.Config
-	c.Name = "hermes-api"
-	c.Host = "0.0.0.0"
-	c.Port = 8888
-	c.Transform.Etcd = discov.EtcdConf{
-		Hosts: []string{
-			"192.168.2.62:2379",
-		},
-		Key: "transform.rpc",
-	}
-	c.Log.Path = "logs"
-	//conf.MustLoad(*configFile, &c)
+	//c.Name = "hermes-api"
+	//c.Host = "0.0.0.0"
+	//c.Port = 8888
+	//c.Transform.Etcd = discov.EtcdConf{
+	//	Hosts: []string{
+	//		"192.168.2.62:2379",
+	//	},
+	//	Key: "transform.rpc",
+	//}
+	//c.Log.Path = "logs"
+	conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)
