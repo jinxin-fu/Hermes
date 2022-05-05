@@ -46,7 +46,7 @@ func PrometheusQuery(resp []types.HermesResp) []types.QueryResp {
 	limiter := make(chan bool, 20)
 	defer close(limiter)
 	v1api1 := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	responseCh := make(chan types.QueryResp)
@@ -82,18 +82,28 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 		fmt.Printf("Error querying Prometheus, alertName:%s error:%v\n", resp.AlertName, err)
 
 	}
-
-	//obj := &unstructured.Unstructured{}
-	//str := result.String()
-	//println(len(result.(model.Vector)))
-	if result.Type() != model.ValVector {
+	var qResult model.Vector
+	switch t := result.Type(); t {
+	case model.ValVector:
+		qResult = result.(model.Vector)
+	default:
 		responseCh <- types.QueryResp{
 			Err: fmt.Errorf("query result is not type vector"),
 		}
 		return
 	}
-	v := result.(model.Vector)[0] // TODO默认去第一个metric值，具体逻辑等上真是环境上调试
-	value := v.Value
+
+	//obj := &unstructured.Unstructured{}
+	//str := result.String()
+	//println(len(result.(model.Vector)))
+	//if result.Type() != model.ValVector {
+	//	responseCh <- types.QueryResp{
+	//		Err: fmt.Errorf("query result is not type vector"),
+	//	}
+	//	return
+	//}
+	//v := result.(model.Vector)[0] // TODO默认去第一个metric值，具体逻辑等上真是环境上调试
+	//value := v.Value
 	//for _, v := range result.(model.Vector) {
 	//	fmt.Printf("value: %v\n", v.Value)
 	//	for k, i := range v.Metric {
@@ -116,7 +126,7 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 		Destination: resp.ReceiverAddress,
 		Expression:  resp.AggerateRules,
 		Flag:        flag,
-		Value:       float64(value),
+		QValue:      qResult,
 		Err:         nil,
 	}
 	<-limiter

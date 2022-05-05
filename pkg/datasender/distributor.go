@@ -8,6 +8,8 @@ package datasender
 
 import (
 	"Hermes/api/inter/types"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -56,7 +58,14 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	}
 	address := "http://192.168.2.64:5000/parsePrometheusAlert"
 	//ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-	req, err := http.NewRequest(http.MethodPost, address, nil)
+	sendbody, err := json.Marshal(qReq.QValue)
+	if err != nil {
+		resCh <- types.DistributeResult{
+			Err: fmt.Errorf("Marshal QValue error :" + err.Error()),
+		}
+	}
+	reader := bytes.NewReader(sendbody)
+	req, err := http.NewRequest(http.MethodPost, address, reader)
 	if err != nil {
 		fmt.Printf("New request error: %s\n", err.Error())
 	}
@@ -66,9 +75,10 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	params := req.URL.Query()
 	params.Add("alertName", qReq.Name)
 	params.Add("witchValue", strconv.FormatBool(qReq.Flag))
-	if qReq.Flag == true {
-		params.Add("value", strconv.FormatFloat(qReq.Value, 'E', -1, 64))
-	}
+	//if qReq.Flag == true {
+	//	params.Add("value", strconv.FormatFloat(qReq.Value, 'E', -1, 64))
+	//}
+
 	cli := http.Client{Timeout: 3 * time.Second}
 	response, err := cli.Do(req)
 	//response, err := http.DefaultClient.Do(req)

@@ -1,5 +1,7 @@
 package types
 
+import "github.com/prometheus/common/model"
+
 type ExpandReq struct {
 	AlertName string `form:"alertName"`
 }
@@ -43,9 +45,9 @@ type AlertmanagerResp struct {
 type QueryResp struct {
 	Name        string
 	Expression  string
-	Value       float64
 	Flag        bool
 	Destination string
+	QValue      model.Vector
 	Err         error
 }
 
