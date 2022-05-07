@@ -56,7 +56,7 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 			Err: fmt.Errorf("error from queryResponse:" + qReq.Err.Error()),
 		}
 	}
-	address := "http://192.168.2.64:5000/parsePrometheusAlert"
+	//address := "http://192.168.2.64:5000/parsePrometheusAlert"
 	//ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 	sendbody, err := json.Marshal(qReq.QValue)
 	if err != nil {
@@ -65,7 +65,7 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 		}
 	}
 	reader := bytes.NewReader(sendbody)
-	req, err := http.NewRequest(http.MethodPost, address, reader)
+	req, err := http.NewRequest(http.MethodPost, qReq.Destination, reader)
 	if err != nil {
 		fmt.Printf("New request error: %s\n", err.Error())
 	}

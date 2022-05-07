@@ -1,22 +1,39 @@
+/*
+Copyright 2022.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package main
 
 import (
-	"Hermes/api/inter/config"
-	"Hermes/api/inter/handler"
-	"Hermes/api/inter/svc"
-	v1 "Hermes/pkg/adaptor/apis/hermes/v1"
-	"Hermes/pkg/adaptor/controllers/hermes"
 	"flag"
-	"fmt"
-	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/rest"
+	"os"
+
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	hermesv1 "subscriberule/apis/hermes/v1"
+	hermescontrollers "subscriberule/controllers/hermes"
+	//+kubebuilder:scaffold:imports
 )
 
 var (
@@ -27,29 +44,11 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(v1.AddToScheme(scheme))
+	utilruntime.Must(hermesv1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
-var configFile = flag.String("f", "api/etc/hermes-api.yaml", "the config file")
-
 func main() {
-	flag.Parse()
-
-	var c config.Config
-	conf.MustLoad(*configFile, &c)
-
-	ctx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
-
-	handler.RegisterHandlers(server, ctx)
-
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	//start hermes main server
-	go server.Start()
-
-	// start hermes subscriber adaptor mananger
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
@@ -63,6 +62,7 @@ func main() {
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
+
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
@@ -77,7 +77,8 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	if err = (&hermes.SubscriberRuleReconciler{
+
+	if err = (&hermescontrollers.SubscriberRuleReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {

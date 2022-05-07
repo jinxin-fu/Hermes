@@ -1,0 +1,17 @@
+domain: pml.com
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+projectName: subscriberule
+repo: subscriberule
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: pml.com
+  group: hermes
+  kind: SubscriberRule
+  path: subscriberule/apis/hermes/v1
+  version: v1
+version: "3"

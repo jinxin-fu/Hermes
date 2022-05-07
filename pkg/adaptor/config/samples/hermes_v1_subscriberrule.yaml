@@ -1,0 +1,6 @@
+apiVersion: hermes.pml.com/v1
+kind: SubscriberRule
+metadata:
+  name: subscriberrule-sample
+spec:
+  # TODO(user): Add fields here

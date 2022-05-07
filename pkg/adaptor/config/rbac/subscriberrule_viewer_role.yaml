@@ -1,0 +1,20 @@
+# permissions for end users to view subscriberrules.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: subscriberrule-viewer-role
+rules:
+- apiGroups:
+  - hermes.pml.com
+  resources:
+  - subscriberrules
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - hermes.pml.com
+  resources:
+  - subscriberrules/status
+  verbs:
+  - get
