@@ -22,3 +22,37 @@ spec:
          namespace, service)) > 10
         labels:
          alertlabel: testalert
+
+---
+apiVersion: hermes.pml.com/v1
+kind: SubscriberRule
+metadata:
+  name: computer-metrics-subscribe1
+spec:
+  subscribeType: SubsRealTime
+  subscriberAddress: "http://ip+port/receiver"
+  realTimeMetricList:
+    - met1
+    - metric2
+---
+apiVersion: hermes.pml.com/v1
+kind: SubscriberRule
+metadata:
+  name: computer-metrics-subscribe2
+spec:
+  subscribeType: SubsCondition
+  subscriberAddress: "http://ip+port/receiver"
+  prometheusRule:
+    groups:
+      - name: test-demo.rules
+        rules:
+          - alert: TestAlert
+            annotations:
+              aggerateRules: 100 * (count(up == 0) BY (job, namespace, service) / count(up)
+                BY (job, namespace, service)) > 10
+              receiverAddress: http://10.0.0.1:9876
+              returnValueFlag: "false"
+            expr: 100 * (count(up == 0) BY (job, namespace, service) / count(up) BY (job,
+              namespace, service)) > 10
+            labels:
+              alertlabel: testalert

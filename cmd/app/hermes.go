@@ -31,7 +31,7 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-var configFile = flag.String("f", "api/etc/hermes-api.yaml", "the config file")
+var configFile = flag.String("f", "etc/hermes-api.yaml", "the config file")
 
 func main() {
 	flag.Parse()
