@@ -57,3 +57,9 @@ type DistributeResult struct {
 	StatusCode int
 	Err        error
 }
+
+type ReceiverReq struct {
+}
+
+type ReveicerResp struct {
+}

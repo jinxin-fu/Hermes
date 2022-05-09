@@ -36,6 +36,16 @@ type (
 	}
 )
 
+type (
+	receiverReq {
+
+	}
+
+	reveicerResp {
+
+	}
+)
+
 service hermes-api {
 	@server(
 		handler: HermesHandler
@@ -46,4 +56,9 @@ service hermes-api {
 		handler: ExpandHandler
 	)
 	get /expand(expandReq) returns(expandResp)
+
+	@server(
+		handler: ReceiverHandler
+	)
+	post /receiver(receiverReq) returns(reveicerResp)
 }
