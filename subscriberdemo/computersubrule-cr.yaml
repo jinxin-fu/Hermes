@@ -46,12 +46,12 @@ spec:
     groups:
       - name: test-demo.rules
         rules:
-          - alert: name1
+          - alert: Deployment-namesapce1-scale-up
             annotations:
               aggerateRules: 100 * (count(up == 0) BY (job, namespace, service) / count(up)
                 BY (job, namespace, service)) > 10
               receiverAddress: http://10.0.0.1:9876
-              returnValueFlag: "true"
+              returnValueFlag: "false"
             expr: 100 * (count(up == 0) BY (job, namespace, service) / count(up) BY (job,
               namespace, service)) > 10
             labels:

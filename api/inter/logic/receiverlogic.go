@@ -4,7 +4,6 @@ import (
 	"Hermes/api/inter/svc"
 	"Hermes/api/inter/types"
 	"context"
-	"fmt"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -31,7 +30,6 @@ func (l *ReceiverLogic) Receiver(req prompb.WriteRequest) (resp *types.ReveicerR
 		for _, l := range ts.Labels {
 			m[model.LabelName(l.Name)] = model.LabelValue(l.Value)
 		}
-		fmt.Println(m)
 
 		for _, s := range ts.Samples {
 			s = s

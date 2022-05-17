@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"Hermes/rpc/transform/transformer"
 	"context"
 
 	"Hermes/api/inter/svc"
@@ -26,17 +25,17 @@ func NewExpandLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ExpandLogi
 
 func (l *ExpandLogic) Expand(req types.ExpandReq) (types.ExpandResp, error) {
 	// add manually
-	resp, err := l.svcCtx.Transformer.Expand(l.ctx, &transformer.ExpandReq{
-		AlertName: req.AlertName,
-	})
-	if err != nil {
-		return types.ExpandResp{}, err
-	}
-	return types.ExpandResp{
-		AlertName:       resp.AlertName,
-		ReturnValueFlag: resp.ReturnValueFlag,
-		ReceiverAddress: resp.ReceiverAddress,
-		AggerateRules:   resp.AggeratuRule,
-	}, nil
-	
+	//resp, err := l.svcCtx.Transformer.Expand(l.ctx, &transformer.ExpandReq{
+	//	AlertName: req.AlertName,
+	//})
+	//if err != nil {
+	//	return types.ExpandResp{}, err
+	//}
+	//return types.ExpandResp{
+	//	AlertName:       resp.AlertName,
+	//	ReturnValueFlag: resp.ReturnValueFlag,
+	//	ReceiverAddress: resp.ReceiverAddress,
+	//	AggerateRules:   resp.AggeratuRule,
+	//}, nil
+	return types.ExpandResp{}, nil
 }

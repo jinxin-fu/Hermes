@@ -3,7 +3,6 @@ package logic
 import (
 	"Hermes/pkg/datasender"
 	"Hermes/pkg/querier"
-	"Hermes/rpc/transform/transformer"
 	"context"
 	"fmt"
 	"sync"
@@ -62,21 +61,21 @@ func processAlerts(l *HermesLogic, req types.AlertsFromAlertmanage) []types.Herm
 func sendToRpc(l *HermesLogic, req types.HermesReq, limiter chan bool, responseCh chan types.HermesResp, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
+	//resp, err := l.svcCtx.Transformer.Hermesen(l.ctx, &transformer.HermesenReq{
+	//	AlertName:       req.AlertName,
+	//	ReceiverAddress: req.ReceiverAddress,
+	//	ReturnValueFlag: req.ReturnValueFlag,
+	//	AggeratuRule:    req.AggerateRules,
+	//})
+	//if err != nil {
+	//	fmt.Printf("process fail %s", err.Error())
+	//	responseCh <- types.HermesResp{}
+	//}
+	responseCh <- types.HermesResp{
 		AlertName:       req.AlertName,
+		AggerateRules:   req.AggerateRules,
 		ReceiverAddress: req.ReceiverAddress,
 		ReturnValueFlag: req.ReturnValueFlag,
-		AggeratuRule:    req.AggerateRules,
-	})
-	if err != nil {
-		fmt.Printf("process fail %s", err.Error())
-		responseCh <- types.HermesResp{}
-	}
-	responseCh <- types.HermesResp{
-		AlertName:       resp.AlertName,
-		AggerateRules:   resp.AggeratuRule,
-		ReceiverAddress: resp.ReceiverAddress,
-		ReturnValueFlag: resp.ReturnValueFlag,
 	}
 	<-limiter
 

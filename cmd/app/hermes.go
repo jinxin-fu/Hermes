@@ -28,6 +28,9 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(v1.AddToScheme(scheme))
+
+	utilruntime.Must(v1.PromRuleAddToScheme(scheme))
+
 	//+kubebuilder:scaffold:scheme
 }
 

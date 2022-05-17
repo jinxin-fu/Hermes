@@ -74,7 +74,7 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	//ctx, _ := context.WithTimeout(context.Background(), time.Duration(t)*time.Second)
 	params := req.URL.Query()
 	params.Add("alertName", qReq.Name)
-	params.Add("witchValue", strconv.FormatBool(qReq.Flag))
+	params.Add("withValue", strconv.FormatBool(qReq.Flag))
 	//if qReq.Flag == true {
 	//	params.Add("value", strconv.FormatFloat(qReq.Value, 'E', -1, 64))
 	//}

@@ -17,15 +17,19 @@ limitations under the License.
 package hermes
 
 import (
-	v1 "Hermes/pkg/adaptor/apis/hermes/v1"
+	hermesv1 "Hermes/pkg/adaptor/apis/hermes/v1"
 	"context"
 	"fmt"
+	v12 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
+
+const RULENAMESPACE = ""
 
 // SubscriberRuleReconciler reconciles a SubscriberRule object
 type SubscriberRuleReconciler struct {
@@ -36,6 +40,7 @@ type SubscriberRuleReconciler struct {
 //+kubebuilder:rbac:groups=hermes.pml.com,resources=subscriberrules,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=hermes.pml.com,resources=subscriberrules/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=hermes.pml.com,resources=subscriberrules/finalizers,verbs=update
+//+kubebuilder:rbac:groups=monitoring.coreos.com,resources=prometheusrules,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -48,23 +53,37 @@ type SubscriberRuleReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
-	subscribeRule := &v1.SubscriberRule{}
+	subscribeRule := &hermesv1.SubscriberRule{}
 	err := r.Get(ctx, req.NamespacedName, subscribeRule)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Info(fmt.Sprintf("%s not found, maybe removed", req.Name))
+			// TODO delete Globalsubscriber or PrometheusRule
 			return ctrl.Result{}, nil
 		}
 		logger.Error(err, "unknown error")
 	}
 	logger.Info("Get object successful")
+	pr := &v12.PrometheusRule{
+		TypeMeta: ctrl.TypeMeta{
+			Kind:       "PrometheusRule",
+			APIVersion: "monitoring.coreos.com/v1",
+		},
+	}
+	//pr.Name = "subscriber.rule"
+	//pr.Namespace = "hypermonitor"
 
+	//err = r.Get(ctx, req.NamespacedName, pr)
+	err = r.Get(ctx, types.NamespacedName{Name: "subscriber.rule", Namespace: "hypermonitor"}, pr)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubscriberRuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1.SubscriberRule{}).
+		For(&hermesv1.SubscriberRule{}).
 		Complete(r)
 }
