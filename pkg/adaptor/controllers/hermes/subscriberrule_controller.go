@@ -18,18 +18,23 @@ package hermes
 
 import (
 	hermesv1 "Hermes/pkg/adaptor/apis/hermes/v1"
+	realtimemprocess "Hermes/pkg/realtimeprocess"
 	"context"
 	"fmt"
 	v12 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-const RULENAMESPACE = ""
+const (
+	REALTIMESUB            = "SubsRealTime"
+	CONDITIONSUB           = "SubsCondition"
+	PROMETHEUSRULNAMESPACE = "hypermonitor"
+)
 
 // SubscriberRuleReconciler reconciles a SubscriberRule object
 type SubscriberRuleReconciler struct {
@@ -58,26 +63,59 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Info(fmt.Sprintf("%s not found, maybe removed", req.Name))
-			// TODO delete Globalsubscriber or PrometheusRule
+			if realtimemprocess.IsInGlobalSrs(req.Name) {
+				realtimemprocess.DeleteGlobalSrs(req.Name)
+			} else {
+				rule := &v12.PrometheusRule{
+					TypeMeta: v1.TypeMeta{
+						Kind:       "PrometheusRule",
+						APIVersion: "monitoring.coreos.com/v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      req.Name,
+						Namespace: PROMETHEUSRULNAMESPACE,
+					},
+				}
+
+				r.Delete(ctx, rule)
+			}
+
 			return ctrl.Result{}, nil
 		}
 		logger.Error(err, "unknown error")
 	}
 	logger.Info("Get object successful")
-	pr := &v12.PrometheusRule{
-		TypeMeta: ctrl.TypeMeta{
-			Kind:       "PrometheusRule",
-			APIVersion: "monitoring.coreos.com/v1",
-		},
-	}
-	//pr.Name = "subscriber.rule"
-	//pr.Namespace = "hypermonitor"
 
-	//err = r.Get(ctx, req.NamespacedName, pr)
-	err = r.Get(ctx, types.NamespacedName{Name: "subscriber.rule", Namespace: "hypermonitor"}, pr)
-	if err != nil {
-		fmt.Println(err.Error())
+	if subscribeRule.Spec.SubscribeType == REALTIMESUB {
+		realtimemprocess.AddGlobalSrs(subscribeRule.Name, subscribeRule.Spec.SubscriberAddress, subscribeRule.Spec.RealTimeMetricList)
+	} else if subscribeRule.Spec.SubscribeType == CONDITIONSUB {
+		rule := &v12.PrometheusRule{
+			TypeMeta: v1.TypeMeta{
+				Kind:       "PrometheusRule",
+				APIVersion: "monitoring.coreos.com/v1",
+			},
+		}
+		rule.Name = subscribeRule.Name
+		rule.Namespace = PROMETHEUSRULNAMESPACE
+		targetSpec := subscribeRule.Spec.PrometheusRule
+		targetSpec.DeepCopyInto(&rule.Spec)
+		r.Create(ctx, rule)
+	} else {
+		logger.Info("Add SubscribeType error")
+		return ctrl.Result{}, nil
 	}
+
+	//pr := &v12.PrometheusRule{
+	//	TypeMeta: v1.TypeMeta{
+	//		Kind:       "PrometheusRule",
+	//		APIVersion: "monitoring.coreos.com/v1",
+	//	},
+	//}
+	//
+	//err = r.Get(ctx, types.NamespacedName{Name: "subscriber.rule", Namespace: "hypermonitor"}, pr)
+	//if err != nil {
+	//	logger.Info(fmt.Sprintf("Get prometheusrule %s fail", req.Name))
+	//}
 	return ctrl.Result{}, nil
 }
 

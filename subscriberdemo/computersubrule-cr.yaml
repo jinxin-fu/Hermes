@@ -30,10 +30,10 @@ metadata:
   name: computer-metrics-subscribe1
 spec:
   subscribeType: SubsRealTime
-  subscriberAddress: "http://ip+port/receiver"
+  subscriberAddress: "http://127.0.0.1:5001/realtimereceiver"
   realTimeMetricList:
-    - met1
-    - metric2
+    - system_memory_usage
+    - system_cpu_time
 ---
 apiVersion: hermes.pml.com/v1
 kind: SubscriberRule

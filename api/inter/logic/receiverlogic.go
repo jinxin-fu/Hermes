@@ -3,8 +3,8 @@ package logic
 import (
 	"Hermes/api/inter/svc"
 	"Hermes/api/inter/types"
+	realtimemprocess "Hermes/pkg/realtimeprocess"
 	"context"
-	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,14 +26,17 @@ func NewReceiverLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Receiver
 func (l *ReceiverLogic) Receiver(req prompb.WriteRequest) (resp *types.ReveicerResp, err error) {
 
 	for _, ts := range req.Timeseries {
-		m := make(model.Metric, len(ts.Labels))
-		for _, l := range ts.Labels {
-			m[model.LabelName(l.Name)] = model.LabelValue(l.Value)
+		metricName := ""
+		for _, v := range ts.Labels {
+			if v.Name == "__name__" {
+				metricName = v.Value
+				break
+			}
+			return
 		}
-
-		for _, s := range ts.Samples {
-			s = s
-			//fmt.Printf("  %f %d %s %s\n", s.Value, s.Timestamp, time.UnixMilli(s.Timestamp), time.Now())
+		ds, is := realtimemprocess.FindDistributeTarget(metricName)
+		if is {
+			(*ds).ReceiverChan <- ts
 		}
 	}
 

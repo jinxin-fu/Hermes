@@ -72,9 +72,11 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	//req.WithContext(ctx)
 	//var t int64 = 5
 	//ctx, _ := context.WithTimeout(context.Background(), time.Duration(t)*time.Second)
-	params := req.URL.Query()
-	params.Add("alertName", qReq.Name)
-	params.Add("withValue", strconv.FormatBool(qReq.Flag))
+	req.Header.Set("alertName", qReq.Name)
+	req.Header.Set("withValue", strconv.FormatBool(qReq.Flag))
+	//params := req.URL.Query()
+	//params.Add("alertName", qReq.Name)
+	//params.Add("withValue", strconv.FormatBool(qReq.Flag))
 	//if qReq.Flag == true {
 	//	params.Add("value", strconv.FormatFloat(qReq.Value, 'E', -1, 64))
 	//}
@@ -95,7 +97,7 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 			Err:        err,
 		}
 	}
-	defer response.Body.Close()
+	//defer response.Body.Close()
 
 	<-limiter
 }
