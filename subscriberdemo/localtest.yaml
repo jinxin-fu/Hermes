@@ -1,0 +1,11 @@
+apiVersion: hermes.pml.com/v1
+kind: SubscriberRule
+metadata:
+  name: subscribe-mlet-metrics
+spec:
+  subscribeType: SubsRealTime
+  subscriberAddress: "http://127.0.0.1:5001/realtimereceiver"
+  realTimeMetricList:
+    - system_memory_usage
+    - system_cpu_time
+    - system_memory_utilization
