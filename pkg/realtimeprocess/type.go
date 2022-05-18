@@ -12,16 +12,19 @@ import (
 	"fmt"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/zeromicro/go-zero/core/stringx"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
 )
 
 var GlobalSrs map[string]SubscribeRule
 var RunningDsMap map[string]*Distributor
+var Rlogger *zap.Logger
 
 func init() {
 	GlobalSrs = make(map[string]SubscribeRule, 100)
 	RunningDsMap = make(map[string]*Distributor, 100)
+	Rlogger, _ = zap.NewProduction()
 }
 
 func AddGlobalSrs(name, callback string, metrics []string) {
@@ -76,11 +79,11 @@ func (d *Distributor) Distribute() {
 		select {
 		case req := <-d.ReceiverChan:
 			go d.doDistribute(req)
-			fmt.Printf("%s -- ds:%s --callback:%s\n", time.Now(), req, d.SubscribeRule.Callback)
+			//Rlogger.Info("Distribute message", zap.String("callback", d.SubscribeRule.Callback))
 		case <-d.LifeControllerChan:
 			close(d.ReceiverChan)
 			close(d.LifeControllerChan)
-			fmt.Printf("Distributer close, consumer address:%s", d.SubscribeRule.Callback)
+			Rlogger.Info("Distribute close", zap.String("callback", d.SubscribeRule.Callback))
 			return
 		default:
 		}
@@ -95,22 +98,16 @@ func (d *Distributor) doDistribute(body prompb.TimeSeries) {
 	}
 	reader := bytes.NewReader(sendBody)
 	req, err := http.NewRequest(http.MethodPost, d.SubscribeRule.Callback, reader)
-	//req, err := http.NewRequest(http.MethodPost, "http://127.0.0.1:5001/realtimereceiver", reader) //for test
 	if err != nil {
-		fmt.Printf("New request error: %s\n", err.Error())
+		Rlogger.Error("New request error", zap.String("Error", err.Error()))
 	}
 	req.Header.Set("subscribeType", "SubsRealTime")
-	//params := req.URL.Query()
-	//params.Set("subscribeType", "SubsRealTime")
 
 	cli := http.Client{Timeout: 10 * time.Second}
 	_, err = cli.Do(req)
 	if err != nil {
-		fmt.Printf("Distribute to consumer err :%s", err.Error())
+		Rlogger.Error("Distribute to consumer err", zap.String("Error", err.Error()))
 	}
-	//if response.Body != nil {
-	//	response.Body.Close()
-	//}
 
 }
 

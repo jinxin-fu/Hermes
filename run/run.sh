@@ -1,11 +1,11 @@
 #!/bin/sh
 
-step=3
+#step=3
 # start hermes
-./transform -f transform.yaml &
-
-sleep $step
+#./transform -f transform.yaml &
+#
+#sleep $step
 
 # start transform
-./hermes -f hermes-api.yaml
+./hermes -f hermes-api.yaml 
 

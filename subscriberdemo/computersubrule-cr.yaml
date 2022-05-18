@@ -41,7 +41,7 @@ metadata:
   name: computer-metrics-subscribe2
 spec:
   subscribeType: SubsCondition
-  subscriberAddress: "http://ip+port/receiver"
+#  subscriberAddress: "http://ip+port/receiver"
   prometheusRule:
     groups:
       - name: test-demo.rules
@@ -50,7 +50,7 @@ spec:
             annotations:
               aggerateRules: 100 * (count(up == 0) BY (job, namespace, service) / count(up)
                 BY (job, namespace, service)) > 10
-              receiverAddress: http://10.0.0.1:9876
+              receiverAddress: http://ip+port/receiver
               returnValueFlag: "false"
             expr: 100 * (count(up == 0) BY (job, namespace, service) / count(up) BY (job,
               namespace, service)) > 10

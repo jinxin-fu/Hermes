@@ -7,8 +7,8 @@
 package realtimemprocess
 
 import (
-	"fmt"
 	"github.com/zeromicro/go-zero/core/stringx"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -47,7 +47,7 @@ func Srs2RunningMap() {
 		for k, v := range RunningDsMap {
 			if _, ok := GlobalSrs[k]; !ok {
 				v.DestroyDistributor()
-				fmt.Printf("close distributor, index :%s\n", k)
+				Rlogger.Info("close distributor", zap.String("index", k))
 				delete(RunningDsMap, k)
 			}
 		}

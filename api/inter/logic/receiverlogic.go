@@ -15,6 +15,8 @@ type ReceiverLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
+const METRICNAMELABELKEY = "__name__"
+
 func NewReceiverLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ReceiverLogic {
 	return &ReceiverLogic{
 		Logger: logx.WithContext(ctx),
@@ -24,19 +26,21 @@ func NewReceiverLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Receiver
 }
 
 func (l *ReceiverLogic) Receiver(req prompb.WriteRequest) (resp *types.ReveicerResp, err error) {
-
 	for _, ts := range req.Timeseries {
 		metricName := ""
 		for _, v := range ts.Labels {
-			if v.Name == "__name__" {
+			if v.Name == METRICNAMELABELKEY {
 				metricName = v.Value
 				break
 			}
+			l.Logger.Error("Get metric name label fail")
 			return
 		}
 		ds, is := realtimemprocess.FindDistributeTarget(metricName)
 		if is {
 			(*ds).ReceiverChan <- ts
+		} else {
+			l.Logger.Error("")
 		}
 	}
 

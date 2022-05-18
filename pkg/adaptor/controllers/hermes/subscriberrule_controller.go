@@ -99,23 +99,12 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		rule.Namespace = PROMETHEUSRULNAMESPACE
 		targetSpec := subscribeRule.Spec.PrometheusRule
 		targetSpec.DeepCopyInto(&rule.Spec)
-		r.Create(ctx, rule)
+		r.Update(ctx, rule)
 	} else {
 		logger.Info("Add SubscribeType error")
 		return ctrl.Result{}, nil
 	}
 
-	//pr := &v12.PrometheusRule{
-	//	TypeMeta: v1.TypeMeta{
-	//		Kind:       "PrometheusRule",
-	//		APIVersion: "monitoring.coreos.com/v1",
-	//	},
-	//}
-	//
-	//err = r.Get(ctx, types.NamespacedName{Name: "subscriber.rule", Namespace: "hypermonitor"}, pr)
-	//if err != nil {
-	//	logger.Info(fmt.Sprintf("Get prometheusrule %s fail", req.Name))
-	//}
 	return ctrl.Result{}, nil
 }
 
