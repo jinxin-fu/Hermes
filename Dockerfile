@@ -25,10 +25,10 @@ ENV TZ Asia/Shanghai
 
 WORKDIR /app
 COPY --from=builder /app/hermes /app/hermes
-COPY --from=builder /build/api/etc/hermes-api.yaml /app/hermes-api.yaml
+#COPY --from=builder /build/api/etc/hermes-api.yaml /app/hermes-api.yaml
 #COPY --from=builder /app/transform /app/transform
 #COPY --from=builder /build/rpc/transform/etc/transform.yaml /app/transform.yaml
 #COPY --from=builder /build/run/run.sh /app/run.sh
 #RUN chmod +x /app/run.sh
-CMD ["./hermes","-f","hermes-api.yaml"]
+CMD ["./hermes","-f","hermes-conf.yaml"]
 #ENTRYPOINT ["/app/run.sh"]

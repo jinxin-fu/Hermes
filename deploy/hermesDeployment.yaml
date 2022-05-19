@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: hermes
-        image: 172.17.21.119:30080/library/hermes:v0.1.0_0418_01
+        image: 172.17.21.119:30080/library/hermes:v0.1.0_0518
         lifecycle:
           preStop:
             exec:
@@ -45,10 +45,18 @@ spec:
         volumeMounts:
         - name: timezone
           mountPath: /etc/localtime
+        - name: hermes-config-vol
+          mountPath: /app
       volumes:
         - name: timezone
           hostPath:
             path: /usr/share/zoneinfo/Asia/Shanghai
+        - configMap:
+            name: hermes-conf
+            items:
+              - key: hermes-config
+                path: hermes-conf.yaml
+          name: hermes-config-vol
 
 ---
 

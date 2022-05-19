@@ -66,18 +66,19 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			if realtimemprocess.IsInGlobalSrs(req.Name) {
 				realtimemprocess.DeleteGlobalSrs(req.Name)
 			} else {
-				rule := &v12.PrometheusRule{
-					TypeMeta: v1.TypeMeta{
-						Kind:       "PrometheusRule",
-						APIVersion: "monitoring.coreos.com/v1",
-					},
-					ObjectMeta: v1.ObjectMeta{
-						Name:      req.Name,
-						Namespace: PROMETHEUSRULNAMESPACE,
-					},
-				}
+				rule := makePrometheusRule(subscribeRule)
+				//rule := &v12.PrometheusRule{
+				//	TypeMeta: v1.TypeMeta{
+				//		Kind:       "PrometheusRule",
+				//		APIVersion: "monitoring.coreos.com/v1",
+				//	},
+				//	ObjectMeta: v1.ObjectMeta{
+				//		Name:      req.Name,
+				//		Namespace: PROMETHEUSRULNAMESPACE,
+				//	},
+				//}
 
-				r.Delete(ctx, rule)
+				r.Delete(ctx, &rule)
 			}
 
 			return ctrl.Result{}, nil
@@ -89,23 +90,51 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if subscribeRule.Spec.SubscribeType == REALTIMESUB {
 		realtimemprocess.AddGlobalSrs(subscribeRule.Name, subscribeRule.Spec.SubscriberAddress, subscribeRule.Spec.RealTimeMetricList)
 	} else if subscribeRule.Spec.SubscribeType == CONDITIONSUB {
-		rule := &v12.PrometheusRule{
-			TypeMeta: v1.TypeMeta{
-				Kind:       "PrometheusRule",
-				APIVersion: "monitoring.coreos.com/v1",
-			},
-		}
-		rule.Name = subscribeRule.Name
-		rule.Namespace = PROMETHEUSRULNAMESPACE
-		targetSpec := subscribeRule.Spec.PrometheusRule
-		targetSpec.DeepCopyInto(&rule.Spec)
-		r.Update(ctx, rule)
+		rule := makePrometheusRule(subscribeRule)
+		//rule := &v12.PrometheusRule{
+		//	TypeMeta: v1.TypeMeta{
+		//		Kind:       "PrometheusRule",
+		//		APIVersion: "monitoring.coreos.com/v1",
+		//	},
+		//}
+		//rule.Name = subscribeRule.Name
+		//rule.Namespace = PROMETHEUSRULNAMESPACE
+		//targetSpec := subscribeRule.Spec.PrometheusRule
+		//targetSpec.DeepCopyInto(&rule.Spec)
+		r.Create(ctx, &rule)
 	} else {
 		logger.Info("Add SubscribeType error")
 		return ctrl.Result{}, nil
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func makePrometheusRule(sr *hermesv1.SubscriberRule) v12.PrometheusRule {
+	rule := v12.PrometheusRule{
+		TypeMeta: v1.TypeMeta{
+			Kind:       "PrometheusRule",
+			APIVersion: "monitoring.coreos.com/v1",
+		},
+	}
+	rule.Annotations = make(map[string]string)
+	rule.Annotations["meta.helm.sh/release-name"] = "prometheus"
+	rule.Annotations["meta.helm.sh/release-namespace"] = "default"
+	rule.Annotations["prometheus-operator-validated"] = "true"
+	rule.Labels = make(map[string]string)
+	rule.Labels["app"] = "kube-prometheus-stack"
+	rule.Labels["app.kubernetes.io/instance"] = "prometheus"
+	rule.Labels["app.kubernetes.io/managed-by"] = "Helm"
+	rule.Labels["app.kubernetes.io/part-of"] = "kube-prometheus-stack"
+	rule.Labels["app.kubernetes.io/version"] = "0.4.0"
+	rule.Labels["chart"] = "kube-prometheus-stack-0.4.0"
+	rule.Labels["heritage"] = "Helm"
+	rule.Labels["release"] = "prometheus"
+	rule.Name = sr.Name
+	rule.Namespace = PROMETHEUSRULNAMESPACE
+	targetSpec := sr.Spec.PrometheusRule
+	targetSpec.DeepCopyInto(&rule.Spec)
+	return rule
 }
 
 // SetupWithManager sets up the controller with the Manager.

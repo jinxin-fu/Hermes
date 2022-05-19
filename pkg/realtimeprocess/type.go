@@ -91,7 +91,7 @@ func (d *Distributor) Distribute() {
 }
 
 func (d *Distributor) doDistribute(body prompb.TimeSeries) {
-
+	metricName := body.Labels[0].Value
 	sendBody, err := json.Marshal(body)
 	if err != nil {
 		return
@@ -102,6 +102,7 @@ func (d *Distributor) doDistribute(body prompb.TimeSeries) {
 		Rlogger.Error("New request error", zap.String("Error", err.Error()))
 	}
 	req.Header.Set("subscribeType", "SubsRealTime")
+	req.Header.Set("metricName", metricName)
 
 	cli := http.Client{Timeout: 10 * time.Second}
 	_, err = cli.Do(req)
