@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Hermes/api/inter/logic"
-	"github.com/Hermes/api/inter/svc"
-	"github.com/Hermes/pkg/parser"
+	"github.com/jinxin-fu/hermes/api/inter/logic"
+	"github.com/jinxin-fu/hermes/api/inter/svc"
+	"github.com/jinxin-fu/hermes/pkg/parser"
 	alertdata "github.com/prometheus/alertmanager/template"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"

@@ -3,12 +3,12 @@ package logic
 import (
 	"context"
 	"fmt"
-	"github.com/Hermes/pkg/datasender"
-	"github.com/Hermes/pkg/querier"
+	"github.com/jinxin-fu/hermes/pkg/datasender"
+	"github.com/jinxin-fu/hermes/pkg/querier"
 	"sync"
 
-	"github.com/Hermes/api/inter/svc"
-	"github.com/Hermes/api/inter/types"
+	"github.com/jinxin-fu/hermes/api/inter/svc"
+	"github.com/jinxin-fu/hermes/api/inter/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

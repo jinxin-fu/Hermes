@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"github.com/Hermes/api/inter/config"
+	"github.com/jinxin-fu/hermes/api/inter/config"
 )
 
 type ServiceContext struct {

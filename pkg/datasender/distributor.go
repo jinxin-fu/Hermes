@@ -10,7 +10,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Hermes/api/inter/types"
+	"github.com/jinxin-fu/hermes/api/inter/types"
 	"net/http"
 	"strconv"
 	"sync"
