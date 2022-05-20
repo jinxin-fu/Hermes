@@ -3,8 +3,8 @@ package logic
 import (
 	"context"
 
-	"Hermes/api/inter/svc"
-	"Hermes/api/inter/types"
+	"github.com/Hermes/api/inter/svc"
+	"github.com/Hermes/api/inter/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

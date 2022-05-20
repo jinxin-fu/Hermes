@@ -7,10 +7,10 @@
 package datasender
 
 import (
-	"Hermes/api/inter/types"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/Hermes/api/inter/types"
 	"net/http"
 	"strconv"
 	"sync"

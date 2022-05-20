@@ -7,9 +7,9 @@
 package querier
 
 import (
-	"Hermes/api/inter/types"
 	"context"
 	"fmt"
+	"github.com/Hermes/api/inter/types"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"

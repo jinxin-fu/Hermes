@@ -6,9 +6,9 @@ package server
 import (
 	"context"
 
-	"Hermes/rpc/transform/inter/logic"
-	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/transform"
+	"github.com/Hermes/rpc/transform/inter/logic"
+	"github.com/Hermes/rpc/transform/inter/svc"
+	"github.com/Hermes/rpc/transform/transform"
 )
 
 type TransformerServer struct {

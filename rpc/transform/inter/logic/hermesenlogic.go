@@ -1,13 +1,13 @@
 package logic
 
 import (
-	"Hermes/rpc/transform/model"
 	"context"
 	"fmt"
+	"github.com/Hermes/rpc/transform/model"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
-	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/transform"
+	"github.com/Hermes/rpc/transform/inter/svc"
+	"github.com/Hermes/rpc/transform/transform"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

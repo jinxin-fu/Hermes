@@ -1,12 +1,12 @@
 package main
 
 import (
-	"Hermes/rpc/transform/inter/config"
-	"Hermes/rpc/transform/inter/server"
-	"Hermes/rpc/transform/inter/svc"
-	"Hermes/rpc/transform/transform"
 	"flag"
 	"fmt"
+	"github.com/Hermes/rpc/transform/inter/config"
+	"github.com/Hermes/rpc/transform/inter/server"
+	"github.com/Hermes/rpc/transform/inter/svc"
+	"github.com/Hermes/rpc/transform/transform"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"

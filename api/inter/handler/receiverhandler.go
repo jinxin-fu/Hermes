@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"Hermes/api/inter/logic"
-	"Hermes/api/inter/svc"
+	"github.com/Hermes/api/inter/logic"
+	"github.com/Hermes/api/inter/svc"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

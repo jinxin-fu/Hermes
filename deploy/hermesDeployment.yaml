@@ -17,36 +17,45 @@ spec:
         app: hermes
     spec:
       containers:
-      - name: hermes
-        image: 172.17.21.119:30080/library/hermes:v0.1.0_0518
-        lifecycle:
-          preStop:
-            exec:
-              command: ["sh","-c","sleep 5"]
-        ports:
-        - containerPort: 8888
-        readinessProbe:
-          tcpSocket:
-            port: 8888
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          tcpSocket:
-            port: 8888
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        resources:
-          requests:
-            cpu: 500m
-            memory: 512Mi
-          limits:
-            cpu: 1000m
-            memory: 1024Mi
-        volumeMounts:
-        - name: timezone
-          mountPath: /etc/localtime
-        - name: hermes-config-vol
-          mountPath: /app
+        - args:
+            - /app/hermes
+            - --metrics-bind-address=:8897
+            - --health-probe-bind-address=:8898
+          name: hermes
+          image: 172.17.21.119:30080/library/hermes:v0.1.0_0520_1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh","-c","sleep 5"]
+          ports:
+            - containerPort: 8897
+            - containerPort: 8898
+            - containerPort: 8899
+          readinessProbe:
+            tcpSocket:
+              port: 8899
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8899
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 2000m
+              memory: 2048Mi
+            limits:
+              cpu: 2000m
+              memory: 2048Mi
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+            - name: hermes-config-vol
+              mountPath: /conf
+      hostNetwork: true
+      serviceAccount: hermes-manager
+      serviceAccountName: hermes-manager
       volumes:
         - name: timezone
           hostPath:
@@ -57,9 +66,7 @@ spec:
               - key: hermes-config
                 path: hermes-conf.yaml
           name: hermes-config-vol
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -68,9 +75,20 @@ metadata:
 spec:
   ports:
     - nodePort: 31447
-      port: 8888
+      name: hermes
+      port: 8899
       protocol: TCP
-      targetPort: 8888
+      targetPort: 8899
+    - nodePort: 31451
+      name: metrics
+      port: 8897
+      protocol: TCP
+      targetPort: 8897
+    - nodePort: 31452
+      port: 8898
+      name: health
+      protocol: TCP
+      targetPort: 8898
   type: NodePort
   selector:
     app: hermes

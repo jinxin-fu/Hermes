@@ -1,10 +1,10 @@
 package logic
 
 import (
-	"Hermes/api/inter/svc"
-	"Hermes/api/inter/types"
-	realtimemprocess "Hermes/pkg/realtimeprocess"
 	"context"
+	"github.com/Hermes/api/inter/svc"
+	"github.com/Hermes/api/inter/types"
+	realtimemprocess "github.com/Hermes/pkg/realtimeprocess"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/zeromicro/go-zero/core/logx"
 )

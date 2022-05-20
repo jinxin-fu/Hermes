@@ -4,7 +4,7 @@ package handler
 import (
 	"net/http"
 
-	"Hermes/api/inter/svc"
+	"github.com/Hermes/api/inter/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )

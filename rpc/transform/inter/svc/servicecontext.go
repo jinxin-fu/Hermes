@@ -1,8 +1,8 @@
 package svc
 
 import (
-	"Hermes/rpc/transform/inter/config"
-	"Hermes/rpc/transform/model"
+	"github.com/Hermes/rpc/transform/inter/config"
+	"github.com/Hermes/rpc/transform/model"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 

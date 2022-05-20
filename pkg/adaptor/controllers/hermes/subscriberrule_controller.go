@@ -17,10 +17,10 @@ limitations under the License.
 package hermes
 
 import (
-	hermesv1 "Hermes/pkg/adaptor/apis/hermes/v1"
-	realtimemprocess "Hermes/pkg/realtimeprocess"
 	"context"
 	"fmt"
+	hermesv1 "github.com/Hermes/pkg/adaptor/apis/hermes/v1"
+	realtimemprocess "github.com/Hermes/pkg/realtimeprocess"
 	v12 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -7,8 +7,8 @@
 package parser
 
 import (
-	"Hermes/api/inter/types"
 	"fmt"
+	"github.com/Hermes/api/inter/types"
 	"github.com/prometheus/alertmanager/template"
 )
 
