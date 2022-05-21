@@ -50,6 +50,10 @@ func main() {
 		Key: "transform.rpc",
 	}
 	c.Log.Path = "logs"
+	c.Log.Mode = "file"
+	c.Log.Compress = true
+	c.Log.KeepDays = 1
+	c.Log.Level = "error"
 	//conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)

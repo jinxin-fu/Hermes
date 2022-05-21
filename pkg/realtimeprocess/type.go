@@ -25,6 +25,7 @@ func init() {
 	GlobalSrs = make(map[string]SubscribeRule, 100)
 	RunningDsMap = make(map[string]*Distributor, 100)
 	Rlogger, _ = zap.NewProduction()
+
 }
 
 func AddGlobalSrs(name, callback string, metrics []string) {
@@ -99,7 +100,7 @@ func (d *Distributor) doDistribute(body prompb.TimeSeries) {
 	reader := bytes.NewReader(sendBody)
 	req, err := http.NewRequest(http.MethodPost, d.SubscribeRule.Callback, reader)
 	if err != nil {
-		Rlogger.Error("New request error", zap.String("Error", err.Error()))
+		Rlogger.Debug("New request error", zap.String("Error", err.Error()))
 	}
 	req.Header.Set("subscribeType", "SubsRealTime")
 	req.Header.Set("metricName", metricName)

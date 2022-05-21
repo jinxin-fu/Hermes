@@ -39,8 +39,6 @@ func (l *ReceiverLogic) Receiver(req prompb.WriteRequest) (resp *types.ReveicerR
 		ds, is := realtimemprocess.FindDistributeTarget(metricName)
 		if is {
 			(*ds).ReceiverChan <- ts
-		} else {
-			l.Logger.Error("")
 		}
 	}
 
