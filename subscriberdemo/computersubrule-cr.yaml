@@ -41,7 +41,7 @@ metadata:
   name: computer-metrics-subscribe2
 spec:
   subscribeType: SubsCondition
-#  subscriberAddress: "http://ip+port/receiver"
+  subscriberAddress: "http://ip+port/receiver"
   prometheusRule:
     groups:
       - name: test-demo.rules

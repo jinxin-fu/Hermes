@@ -17,10 +17,10 @@ limitations under the License.
 package hermes
 
 import (
+	hermesv1 "Hermes/pkg/adaptor/apis/hermes/v1"
+	realtimemprocess "Hermes/pkg/realtimeprocess"
 	"context"
 	"fmt"
-	hermesv1 "github.com/jinxin-fu/hermes/pkg/adaptor/apis/hermes/v1"
-	realtimemprocess "github.com/jinxin-fu/hermes/pkg/realtimeprocess"
 	v12 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -66,19 +66,12 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			if realtimemprocess.IsInGlobalSrs(req.Name) {
 				realtimemprocess.DeleteGlobalSrs(req.Name)
 			} else {
-				rule := makePrometheusRule(subscribeRule)
-				//rule := &v12.PrometheusRule{
-				//	TypeMeta: v1.TypeMeta{
-				//		Kind:       "PrometheusRule",
-				//		APIVersion: "monitoring.coreos.com/v1",
-				//	},
-				//	ObjectMeta: v1.ObjectMeta{
-				//		Name:      req.Name,
-				//		Namespace: PROMETHEUSRULNAMESPACE,
-				//	},
+				logger.Info(fmt.Sprintf("Delete PrometheusRule %s", subscribeRule.Name))
+				//rule := makePrometheusRule(subscribeRule)
+				//err := r.Delete(ctx, &rule)
+				//if err != nil {
+				//	logger.Error(err, "delete rule fail")
 				//}
-
-				r.Delete(ctx, &rule)
 			}
 
 			return ctrl.Result{}, nil
@@ -90,18 +83,24 @@ func (r *SubscriberRuleReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if subscribeRule.Spec.SubscribeType == REALTIMESUB {
 		realtimemprocess.AddGlobalSrs(subscribeRule.Name, subscribeRule.Spec.SubscriberAddress, subscribeRule.Spec.RealTimeMetricList)
 	} else if subscribeRule.Spec.SubscribeType == CONDITIONSUB {
+		promRule := &v12.PrometheusRule{}
 		rule := makePrometheusRule(subscribeRule)
-		//rule := &v12.PrometheusRule{
-		//	TypeMeta: v1.TypeMeta{
-		//		Kind:       "PrometheusRule",
-		//		APIVersion: "monitoring.coreos.com/v1",
-		//	},
-		//}
-		//rule.Name = subscribeRule.Name
-		//rule.Namespace = PROMETHEUSRULNAMESPACE
-		//targetSpec := subscribeRule.Spec.PrometheusRule
-		//targetSpec.DeepCopyInto(&rule.Spec)
-		r.Create(ctx, &rule)
+		err := r.Get(ctx, req.NamespacedName, promRule)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				err = r.Create(ctx, &rule)
+				if err != nil {
+					logger.Error(err, "Create rule fail")
+				}
+				logger.Info(fmt.Sprintf("Create PrometheusRule %s success.", subscribeRule.Name))
+				return ctrl.Result{}, nil
+			}
+		}
+		rule.Spec.DeepCopyInto(&promRule.Spec)
+		err = r.Update(ctx, promRule)
+		if err != nil {
+			logger.Error(err, "Update rule fail")
+		}
 	} else {
 		logger.Info("Add SubscribeType error")
 		return ctrl.Result{}, nil
@@ -134,6 +133,9 @@ func makePrometheusRule(sr *hermesv1.SubscriberRule) v12.PrometheusRule {
 	rule.Namespace = PROMETHEUSRULNAMESPACE
 	targetSpec := sr.Spec.PrometheusRule
 	targetSpec.DeepCopyInto(&rule.Spec)
+	rule.ObjectMeta.OwnerReferences = []v1.OwnerReference{
+		*v1.NewControllerRef(sr, hermesv1.GroupVersion.WithKind("SubscriberRule")),
+	} // TODO add ownerreferences
 	return rule
 }
 

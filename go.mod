@@ -1,4 +1,4 @@
-module github.com/jinxin-fu/hermes
+module Hermes
 
 go 1.17
 

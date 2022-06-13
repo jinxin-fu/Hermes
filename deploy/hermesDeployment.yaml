@@ -19,10 +19,12 @@ spec:
       containers:
         - args:
             - /app/hermes
+            - -f
+            - /conf/hermes-conf.yaml
             - --metrics-bind-address=:8897
             - --health-probe-bind-address=:8898
           name: hermes
-          image: 172.17.21.119:30080/library/hermes:v0.1.0_0520_1
+          image: 172.17.21.119:30080/library/hermes:v0.1.0_0521_02
           lifecycle:
             preStop:
               exec:
@@ -30,15 +32,15 @@ spec:
           ports:
             - containerPort: 8897
             - containerPort: 8898
-            - containerPort: 8899
+            - containerPort: 8896
           readinessProbe:
             tcpSocket:
-              port: 8899
+              port: 8896
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             tcpSocket:
-              port: 8899
+              port: 8896
             initialDelaySeconds: 15
             periodSeconds: 20
           resources:
@@ -76,9 +78,9 @@ spec:
   ports:
     - nodePort: 31447
       name: hermes
-      port: 8899
+      port: 8896
       protocol: TCP
-      targetPort: 8899
+      targetPort: 8896
     - nodePort: 31451
       name: metrics
       port: 8897

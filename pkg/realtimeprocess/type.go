@@ -25,7 +25,6 @@ func init() {
 	GlobalSrs = make(map[string]SubscribeRule, 100)
 	RunningDsMap = make(map[string]*Distributor, 100)
 	Rlogger, _ = zap.NewProduction()
-
 }
 
 func AddGlobalSrs(name, callback string, metrics []string) {
@@ -108,7 +107,7 @@ func (d *Distributor) doDistribute(body prompb.TimeSeries) {
 	cli := http.Client{Timeout: 10 * time.Second}
 	_, err = cli.Do(req)
 	if err != nil {
-		Rlogger.Error("Distribute to consumer err", zap.String("Error", err.Error()))
+		Rlogger.Debug("Distribute to consumer err", zap.String("Error", err.Error()))
 	}
 
 }

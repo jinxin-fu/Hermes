@@ -3,9 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/jinxin-fu/hermes/api/inter/logic"
-	"github.com/jinxin-fu/hermes/api/inter/svc"
-	"github.com/jinxin-fu/hermes/api/inter/types"
+	"Hermes/api/inter/logic"
+	"Hermes/api/inter/svc"
+	"Hermes/api/inter/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

@@ -1,14 +1,14 @@
 package main
 
 import (
+	"Hermes/api/inter/config"
+	"Hermes/api/inter/handler"
+	"Hermes/api/inter/svc"
+	v1 "Hermes/pkg/adaptor/apis/hermes/v1"
+	"Hermes/pkg/adaptor/controllers/hermes"
 	"flag"
 	"fmt"
-	"github.com/jinxin-fu/hermes/api/inter/config"
-	"github.com/jinxin-fu/hermes/api/inter/handler"
-	"github.com/jinxin-fu/hermes/api/inter/svc"
-	v1 "github.com/jinxin-fu/hermes/pkg/adaptor/apis/hermes/v1"
-	"github.com/jinxin-fu/hermes/pkg/adaptor/controllers/hermes"
-	"github.com/zeromicro/go-zero/core/discov"
+	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -34,27 +34,35 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-//var configFile = flag.String("f", "etc/hermes-conf.yaml", "the config file")
+var configFile = flag.String("f", "/conf/hermes-conf.yaml", "the config file")
 
 func main() {
+	var metricsAddr string
+	var enableLeaderElection bool
+	var probeAddr string
+	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8897", "The address the metric endpoint binds to.")
+	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8898", "The address the probe endpoint binds to.")
+	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
+		"Enable leader election for controller manager. "+
+			"Enabling this will ensure there is only one active controller manager.")
 	flag.Parse()
 
 	var c config.Config
-	c.Name = "hermes-api"
-	c.Host = "0.0.0.0"
-	c.Port = 8899
-	c.Transform.Etcd = discov.EtcdConf{
-		Hosts: []string{
-			"192.168.2.62:2379",
-		},
-		Key: "transform.rpc",
-	}
-	c.Log.Path = "logs"
-	c.Log.Mode = "file"
-	c.Log.Compress = true
-	c.Log.KeepDays = 1
-	c.Log.Level = "error"
-	//conf.MustLoad(*configFile, &c)
+	//c.Name = "hermes-api"
+	//c.Host = "0.0.0.0"
+	//c.Port = 8899
+	//c.Transform.Etcd = discov.EtcdConf{
+	//	Hosts: []string{
+	//		"192.168.2.62:2379",
+	//	},
+	//	Key: "transform.rpc",
+	//}
+	//c.Log.Path = "logs"
+	//c.Log.Mode = "file"
+	//c.Log.Compress = true
+	//c.Log.KeepDays = 1
+	//c.Log.Level = "error"
+	conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)
@@ -67,14 +75,7 @@ func main() {
 	go server.Start()
 
 	// start hermes subscriber adaptor mananger
-	var metricsAddr string
-	var enableLeaderElection bool
-	var probeAddr string
-	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
-	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
-		"Enable leader election for controller manager. "+
-			"Enabling this will ensure there is only one active controller manager.")
+
 	opts := zap.Options{
 		Development: true,
 	}

@@ -10,9 +10,16 @@ data:
   hermes-config: |
     Name: hermes-api
     Host: 0.0.0.0
-    Port: 8899
+    Port: 8896
     Transform:
       Etcd:
         Hosts:
           - 192.168.2.62:2379
         Key: transform.rpc
+    Log:
+      Mode: file
+      Path: hermeslogs
+      Level: error
+      Compress: true
+      KeepDays: 1
+      StackCooldownMillis: 200    

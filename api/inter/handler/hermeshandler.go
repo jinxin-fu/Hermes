@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"Hermes/api/inter/logic"
+	"Hermes/api/inter/svc"
+	"Hermes/pkg/parser"
 	"encoding/json"
 	"fmt"
-	"github.com/jinxin-fu/hermes/api/inter/logic"
-	"github.com/jinxin-fu/hermes/api/inter/svc"
-	"github.com/jinxin-fu/hermes/pkg/parser"
 	alertdata "github.com/prometheus/alertmanager/template"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
