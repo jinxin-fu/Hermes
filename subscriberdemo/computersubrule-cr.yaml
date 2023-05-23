@@ -38,21 +38,22 @@ spec:
 apiVersion: hermes.pml.com/v1
 kind: SubscriberRule
 metadata:
-  name: computer-metrics-subscribe2
+  name: test-qps
+  namespace: hypermonitor
 spec:
-  subscribeType: SubsCondition
-  subscriberAddress: "http://ip+port/receiver"
   prometheusRule:
     groups:
-      - name: test-demo.rules
+      - name: serverless.rules.case4-component1-5.test1
         rules:
-          - alert: Deployment-namesapce1-scale-up
+          - alert: test-qps.rules
             annotations:
-              aggerateRules: 100 * (count(up == 0) BY (job, namespace, service) / count(up)
-                BY (job, namespace, service)) > 10
-              receiverAddress: http://ip+port/receiver
-              returnValueFlag: "false"
-            expr: 100 * (count(up == 0) BY (job, namespace, service) / count(up) BY (job,
-              namespace, service)) > 10
+              aggerateRules: rate(io_sid_traffics{component_id=""}[30s]) > bool 0 > 0
+              receiverAddress: http://192.168.101.47:5000/receiver
+              returnValueFlag: "true"
+            expr: rate(io_sid_traffics{component_id=""}[30s]) > bool 0 > 0
+            for: 1s
             labels:
-              alertlabel: testalert
+              alertlabel: test
+              severity: critical
+  subscribeType: SubsCondition
+  subscriberAddress: http://192.168.101.47:5000/receiver

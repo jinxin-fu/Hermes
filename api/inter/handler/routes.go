@@ -27,6 +27,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/receiver",
 				Handler: ReceiverHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/query",
+				Handler: QueryHandler(serverCtx),
+			},
 		},
 	)
 }

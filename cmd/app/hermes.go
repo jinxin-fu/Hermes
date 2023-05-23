@@ -34,7 +34,7 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-var configFile = flag.String("f", "/conf/hermes-conf.yaml", "the config file")
+var configFile = flag.String("f", "api/etc/hermes-conf.yaml", "the config file")
 
 func main() {
 	var metricsAddr string

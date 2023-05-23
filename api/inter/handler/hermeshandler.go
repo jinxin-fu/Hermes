@@ -14,6 +14,11 @@ import (
 func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		//fmt.Println("=========================")
+		//v, _ := httputil.DumpRequest(r, true)
+		//fmt.Println(string(v))
+		//fmt.Println("=========================")
+
 		data := alertdata.Data{}
 
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -27,8 +32,8 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.Error(w, err)
 		}
 
-		fmt.Printf("Trigger alerts number: %d\n", len(data.Alerts))
-		fmt.Printf("Valid hyperos alert number: %d\n", len(alertInfo.Alerts))
+		//fmt.Printf("Trigger alerts number: %d\n", len(data.Alerts))
+		//fmt.Printf("Valid hyperos alert number: %d\n", len(alertInfo.Alerts))
 		//res, _ := json.Marshal(alertInfo.Alerts)
 		//
 		//var out bytes.Buffer
@@ -47,7 +52,6 @@ func HermesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if alertInfo.MacthedAlerts == 0 {
 			httpx.Error(w, fmt.Errorf("no matched hyperos-rule trigger in hermes."))
 		}
-
 		l := logic.NewHermesLogic(r.Context(), svcCtx)
 		resp, err := l.Hermes(alertInfo)
 		if err != nil {

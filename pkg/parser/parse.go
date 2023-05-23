@@ -10,6 +10,7 @@ import (
 	"Hermes/api/inter/types"
 	"fmt"
 	"github.com/prometheus/alertmanager/template"
+	"net/http"
 )
 
 const (
@@ -46,4 +47,8 @@ func AlertInfoParser(data template.Data, alertNumber int) (types.AlertsFromAlert
 	alertsInfo.MacthedAlerts = count
 
 	return alertsInfo, nil
+}
+
+func QueryInfoParser(r *http.Request) (types.QueryReq, error) {
+	return types.QueryReq{}, nil
 }

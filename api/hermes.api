@@ -46,6 +46,16 @@ type (
 	}
 )
 
+type (
+	queryReq {
+
+	}
+
+	queryResp {
+
+	}
+)
+
 service hermes-api {
 	@server(
 		handler: HermesHandler
@@ -61,4 +71,9 @@ service hermes-api {
 		handler: ReceiverHandler
 	)
 	post /receiver(receiverReq) returns(reveicerResp)
+
+	@server(
+		handler: QueryHandler
+	)
+	post /query(queryReq) returns(queryResp)
 }

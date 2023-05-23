@@ -43,7 +43,7 @@ func Distributor(qResps []types.QueryResp) ([]types.DistributeResult, error) {
 		go DoRequest(v, responseCh, limiter, wg)
 	}
 	wg.Wait()
-	fmt.Println("Distributor process finished.")
+	//fmt.Println("Distributor process finished.")
 	close(responseCh)
 	wgResponse.Wait()
 	return dRes, nil
@@ -51,6 +51,8 @@ func Distributor(qResps []types.QueryResp) ([]types.DistributeResult, error) {
 
 func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter chan bool, wg *sync.WaitGroup) {
 	defer wg.Done()
+	//fmt.Println()
+	//fmt.Println("do request start time:", time.Now().Format("2006-01-02 15:04:05.999999999 -0700 MST"))
 	if qReq.Err != nil {
 		resCh <- types.DistributeResult{
 			Err: fmt.Errorf("error from queryResponse:" + qReq.Err.Error()),
@@ -58,6 +60,7 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	}
 	//address := "http://192.168.2.64:5000/parsePrometheusAlert"
 	//ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+
 	sendbody, err := json.Marshal(qReq.QValue)
 	if err != nil {
 		resCh <- types.DistributeResult{
@@ -100,4 +103,6 @@ func DoRequest(qReq types.QueryResp, resCh chan types.DistributeResult, limiter 
 	//defer response.Body.Close()
 
 	<-limiter
+	//fmt.Println()
+	//fmt.Println("do request end time: ", time.Now().Format("2006-01-02 15:04:05.999999999 -0700 MST"))
 }

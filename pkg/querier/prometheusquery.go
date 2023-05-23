@@ -15,6 +15,7 @@ import (
 	"github.com/prometheus/common/model"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -25,10 +26,12 @@ import (
 var client api.Client
 var initErr error
 
+const QPSMETRICNAME = "io_sid_traffics"
+
 func init() {
 	add := os.Getenv("PROMETHEUSADDRESS")
 	if add == "" {
-		add = "http://192.168.1.51:31445"
+		add = "http://127.0.0.1:31445"
 	}
 	client, initErr = api.NewClient(api.Config{
 		Address: add,
@@ -67,7 +70,7 @@ func PrometheusQuery(resp []types.HermesResp) []types.QueryResp {
 	}
 
 	wg.Wait()
-	fmt.Println("Prometheus query process finished")
+	//fmt.Println("Prometheus query process finished")
 	close(responseCh)
 	wgResponse.Wait()
 	return qResps
@@ -76,10 +79,28 @@ func PrometheusQuery(resp []types.HermesResp) []types.QueryResp {
 
 func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter chan bool, responseCh chan types.QueryResp, wg *sync.WaitGroup) {
 	defer wg.Done()
+	var querySql string
+	if strings.Contains(resp.AggerateRules, QPSMETRICNAME) {
+		querySqls := strings.Split(resp.AggerateRules, ">")
+		querySql = querySqls[0]
+	} else {
+		querySql = resp.AggerateRules
+	}
+	//querySql := strings.Split(resp.AggerateRules, ">")
+	result, _, err := api.Query(ctx, querySql, time.Now())
 
-	result, _, err := api.Query(ctx, resp.AggerateRules, time.Now())
+	//t := v1.Range{
+	//	Start: time.Now().Add(-time.Minute),
+	//	End:   time.Now(),
+	//	Step:  time.Second,
+	//}
+	//result, _, err := api.QueryRange(ctx, resp.AggerateRules, t)
 	if err != nil {
 		fmt.Printf("Error querying Prometheus, alertName:%s error:%v\n", resp.AlertName, err)
+		responseCh <- types.QueryResp{
+			Err: fmt.Errorf(fmt.Sprintf("Error querying Prometheus, alertName:%s error:%v\n", resp.AlertName, err)),
+		}
+		return
 
 	}
 	var qResult model.Vector
@@ -98,7 +119,7 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 	//println(len(result.(model.Vector)))
 	//if result.Type() != model.ValVector {
 	//	responseCh <- types.QueryResp{
-	//		Err: fmt.Errorf("query result is not type vector"),
+	//		Err: fmt.Errorf("query result is not type vectogr"),
 	//	}
 	//	return
 	//}

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"Hermes/api/inter/svc"
 	"Hermes/api/inter/types"
@@ -32,9 +33,15 @@ func processAlerts(l *HermesLogic, req types.AlertsFromAlertmanage) []types.Herm
 	wg := &sync.WaitGroup{}
 	limiter := make(chan bool, 20) //限制最大并发
 	defer close(limiter)
-
 	responseCh := make(chan types.HermesResp, req.MacthedAlerts)
 	wgResponse := &sync.WaitGroup{}
+
+	for _, v := range req.Alerts {
+		wg.Add(1)
+		limiter <- true
+		go sendToRpc(l, v, limiter, responseCh, wg)
+	}
+
 	go func() {
 		wgResponse.Add(1)
 		for response := range responseCh {
@@ -43,14 +50,8 @@ func processAlerts(l *HermesLogic, req types.AlertsFromAlertmanage) []types.Herm
 		wgResponse.Done()
 	}()
 
-	for _, v := range req.Alerts {
-		wg.Add(1)
-		limiter <- true
-		go sendToRpc(l, v, limiter, responseCh, wg)
-	}
-
 	wg.Wait()
-	fmt.Println("Alerts process finished.")
+	//fmt.Println("Alerts process finished.")
 	close(responseCh)
 
 	wgResponse.Wait()
@@ -83,10 +84,8 @@ func sendToRpc(l *HermesLogic, req types.HermesReq, limiter chan bool, responseC
 func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.AlertmanagerResp, error) {
 	// process alerts and send data to rpc transformer backend mysql
 	res := processAlerts(l, req)
-
 	// query result form prometheus
 	queryResult := querier.PrometheusQuery(res)
-
 	// distribute data to consumer
 	disResult, err := datasender.Distributor(queryResult)
 	if err != nil {
@@ -94,9 +93,9 @@ func (l *HermesLogic) Hermes(req types.AlertsFromAlertmanage) (types.Alertmanage
 		return types.AlertmanagerResp{}, fmt.Errorf("Distribute messager error : %s", err.Error())
 	}
 	for _, v := range disResult {
-		fmt.Printf("singel distribute result :%v\n", v)
+		//l.Logger.Info("singel distribute result :", v)
+		fmt.Printf("singel distribute result :%v, time:%v\n", v, time.Now().Format("2006-01-02 15:04:05"))
 	}
-
 	return types.AlertmanagerResp{
 		Receiver:        req.Receiver,
 		MatchedAlerts:   req.MacthedAlerts,

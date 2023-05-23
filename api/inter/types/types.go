@@ -63,3 +63,13 @@ type ReceiverReq struct {
 
 type ReveicerResp struct {
 }
+
+type QueryReq struct {
+	MethodType string `from:"methodType"`
+	QuerySql   string `from:"querySlq"`
+	StartTime  string `from:"startTime"`
+	EndTime    string `from:"endTime"`
+}
+
+type QueryPromResp struct {
+}
