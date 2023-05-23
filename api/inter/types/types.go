@@ -1,6 +1,9 @@
 package types
 
-import "github.com/prometheus/common/model"
+import (
+	"github.com/prometheus/common/model"
+	"time"
+)
 
 type ExpandReq struct {
 	AlertName string `form:"alertName"`
@@ -65,10 +68,12 @@ type ReveicerResp struct {
 }
 
 type QueryReq struct {
-	MethodType string `from:"methodType"`
-	QuerySql   string `from:"querySlq"`
-	StartTime  string `from:"startTime"`
-	EndTime    string `from:"endTime"`
+	MethodType string        `from:"methodType"`
+	QuerySql   string        `from:"querySlq"`
+	Time       time.Time     `from:"time"`
+	StartTime  time.Time     `from:"startTime"`
+	EndTime    time.Time     `from:"endTime"`
+	Step       time.Duration `from:"step"`
 }
 
 type QueryPromResp struct {

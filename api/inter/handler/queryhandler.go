@@ -13,12 +13,13 @@ import (
 	"fmt"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
+	"net/http/httputil"
 )
 
 func QueryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//req1, _ := httputil.DumpRequest(r, true)
-		//fmt.Println(string(req1))
+		req1, _ := httputil.DumpRequest(r, true)
+		fmt.Println(string(req1))
 
 		req, err := parser.QueryInfoParser(r)
 		if err != nil {

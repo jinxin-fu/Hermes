@@ -10,6 +10,7 @@ import (
 	"Hermes/api/inter/types"
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
@@ -25,6 +26,7 @@ import (
 
 var client api.Client
 var initErr error
+var qApi v1.API
 
 const QPSMETRICNAME = "io_sid_traffics"
 
@@ -40,6 +42,7 @@ func init() {
 		fmt.Printf("Error creating client: %v\n", initErr)
 		log.Fatal(initErr)
 	}
+	qApi = v1.NewAPI(client)
 
 }
 
@@ -151,4 +154,38 @@ func GetQuery(api v1.API, ctx context.Context, resp types.HermesResp, limiter ch
 		Err:         nil,
 	}
 	<-limiter
+}
+
+func Query(sql string, ts time.Time) (model.Vector, error) {
+	result, _, err := qApi.Query(context.Background(), sql, ts)
+	if err != nil {
+		fmt.Printf("Query error, %s\n", err.Error())
+		_ = result
+		return model.Vector{}, err
+	}
+	var qResult model.Vector
+	switch t := result.Type(); t {
+	case model.ValVector:
+		qResult = result.(model.Vector)
+	default:
+		return model.Vector{}, errors.Errorf("query result is not type vector")
+	}
+	return qResult, nil
+}
+
+func QueryRange(sql string, start time.Time, end time.Time, step time.Duration) (model.Vector, error) {
+	result, _, err := qApi.QueryRange(context.Background(), sql, v1.Range{Start: start, End: end, Step: step})
+	if err != nil {
+		fmt.Printf("Query error, %s\n", err.Error())
+		_ = result
+		return model.Vector{}, err
+	}
+	var qResult model.Vector
+	switch t := result.Type(); t {
+	case model.ValVector:
+		qResult = result.(model.Vector)
+	default:
+		return model.Vector{}, errors.Errorf("query result is not type vector")
+	}
+	return qResult, nil
 }
