@@ -77,4 +77,6 @@ type QueryReq struct {
 }
 
 type QueryPromResp struct {
+	QueryValV model.Vector
+	QueryValM model.Matrix
 }

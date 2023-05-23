@@ -38,13 +38,16 @@ func NewQueryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *QueryLogic 
 
 func (l *QueryLogic) Query(req types.QueryReq) (types.QueryPromResp, error) {
 	fmt.Printf("%+v\n", req)
-	var val model.Vector
+	var valV model.Vector
+	var valM model.Matrix
 	var err error
 	switch req.MethodType {
 	case QUERYRANGE:
-		val, err = querier.QueryRange(req.QuerySql, req.StartTime, req.EndTime, req.Step)
+		valM, err = querier.QueryRange(req.QuerySql, req.StartTime, req.EndTime, req.Step)
+		fmt.Printf("%+v\n", valM)
 	case QUERY:
-		val, err = querier.Query(req.QuerySql, req.Time)
+		valV, err = querier.Query(req.QuerySql, req.Time)
+		fmt.Printf("%+v\n", valV)
 	default:
 		l.Logger.Error("Query method error.")
 		return types.QueryPromResp{}, errors.Errorf("Query method error. type: %s", req.MethodType)
@@ -52,6 +55,6 @@ func (l *QueryLogic) Query(req types.QueryReq) (types.QueryPromResp, error) {
 	if err != nil {
 		return types.QueryPromResp{}, err
 	}
-	fmt.Printf("%+v\n", val)
-	return types.QueryPromResp{}, nil
+
+	return types.QueryPromResp{QueryValV: valV, QueryValM: valM}, nil
 }

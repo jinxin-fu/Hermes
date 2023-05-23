@@ -173,19 +173,21 @@ func Query(sql string, ts time.Time) (model.Vector, error) {
 	return qResult, nil
 }
 
-func QueryRange(sql string, start time.Time, end time.Time, step time.Duration) (model.Vector, error) {
+func QueryRange(sql string, start time.Time, end time.Time, step time.Duration) (model.Matrix, error) {
 	result, _, err := qApi.QueryRange(context.Background(), sql, v1.Range{Start: start, End: end, Step: step})
 	if err != nil {
 		fmt.Printf("Query error, %s\n", err.Error())
 		_ = result
-		return model.Vector{}, err
+		return model.Matrix{}, err
 	}
-	var qResult model.Vector
+	var qResult model.Matrix
 	switch t := result.Type(); t {
-	case model.ValVector:
-		qResult = result.(model.Vector)
+	//case model.ValVector:
+	//	qResult = result.(model.Vector)
+	case model.ValMatrix:
+		qResult = result.(model.Matrix)
 	default:
-		return model.Vector{}, errors.Errorf("query result is not type vector")
+		return model.Matrix{}, errors.Errorf("query result is not type ValMatrix")
 	}
 	return qResult, nil
 }
