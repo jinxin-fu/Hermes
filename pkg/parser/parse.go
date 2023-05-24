@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/prometheus/alertmanager/template"
+	"github.com/prometheus/common/model"
 	"math"
 	"net/http"
 	"strconv"
@@ -85,7 +86,20 @@ func QueryInfoParser(r *http.Request) (types.QueryReq, error) {
 		queryReq.MethodType = QUERYRANGE
 		queryReq.StartTime, _ = parseTime(r.FormValue("start"))
 		queryReq.EndTime, _ = parseTime(r.FormValue("end"))
-		queryReq.Step = time.Minute //temporary query step value
+		step := r.FormValue("step")
+		if step == "" {
+			queryReq.Step = time.Minute //temporary query step value
+		} else {
+			stepVal, err := parseDuration(r.FormValue("step"))
+			if err != nil {
+				fmt.Printf("Parse duration step error, use default value 1 minute")
+				queryReq.Step = time.Minute
+			} else {
+				queryReq.Step = stepVal
+			}
+
+		}
+
 	} else {
 		queryReq.QuerySql = methodQuery
 		queryReq.MethodType = QUERY
@@ -123,4 +137,18 @@ func parseTime(s string) (time.Time, error) {
 		return maxTime, nil
 	}
 	return time.Time{}, errors.Errorf("cannot parse %q to a valid timestamp", s)
+}
+
+func parseDuration(s string) (time.Duration, error) {
+	if d, err := strconv.ParseFloat(s, 64); err == nil {
+		ts := d * float64(time.Second)
+		if ts > float64(math.MaxInt64) || ts < float64(math.MinInt64) {
+			return 0, errors.Errorf("cannot parse %q to a valid duration. It overflows int64", s)
+		}
+		return time.Duration(ts), nil
+	}
+	if d, err := model.ParseDuration(s); err == nil {
+		return time.Duration(d), nil
+	}
+	return 0, errors.Errorf("cannot parse %q to a valid duration", s)
 }

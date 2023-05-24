@@ -37,7 +37,6 @@ func NewQueryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *QueryLogic 
 }
 
 func (l *QueryLogic) Query(req types.QueryReq) (types.QueryPromResp, error) {
-	fmt.Printf("%+v\n", req)
 	var valV model.Vector
 	var valM model.Matrix
 	var err error
